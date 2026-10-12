@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import ReactGA from 'react-ga4';
 import * as analyticsModule from './analytics';
 
 /**
@@ -23,7 +24,9 @@ const commandsOfType = (type: string) => commands().filter(([first]) => first ==
 const clearGtag = () => {
   delete window.dataLayer;
   delete window.gtag;
-  document.getElementById('ga4-gtag')?.remove();
+  /* Every gtag script, not one by id: react-ga4 appends its own with no identifying attribute,
+     so matching on src is the only way to stop them accumulating across tests. */
+  document.querySelectorAll('script[src*="googletagmanager"]').forEach((s) => s.remove());
 };
 
 const clearCookies = () => {
@@ -34,6 +37,11 @@ const clearCookies = () => {
 };
 
 beforeEach(() => {
+  /* vitest externalises node_modules, so vi.resetModules() does NOT re-evaluate react-ga4 — its
+     singleton keeps isInitialized across tests and initialize() then silently skips js/config.
+     Production calls initAnalytics once, so this is a test-isolation concern only, but without
+     it every test after the first measures the wrong thing. */
+  ReactGA.reset();
   clearGtag();
   clearCookies();
   window.localStorage.clear();
@@ -141,10 +149,12 @@ describe('with a measurement ID', () => {
     // is a default that never applied, and the failure is invisible: the integration looks
     // correct and sets cookies anyway.
     const types = commands().map(([type]) => String(type));
+    // Consent first, then react-ga4's js and config. Reversed, Consent Mode reads nothing and
+    // the integration sets cookies while looking correct.
     expect(types[0]).toBe('consent');
-    expect(types).toContain('js');
-    // The script tag is appended last, after every queued command.
-    expect(document.getElementById('ga4-gtag')).not.toBeNull();
+    expect(types.indexOf('js')).toBeGreaterThan(0);
+    expect(types.indexOf('config')).toBeGreaterThan(types.indexOf('js'));
+    expect(document.querySelector('script[src*="googletagmanager"]')).not.toBeNull();
 
     const config = commands().find(([type]) => type === 'config');
     expect(config?.[1]).toBe(ID);
@@ -159,10 +169,11 @@ describe('with a measurement ID', () => {
     expect((config?.[2] as Record<string, unknown>).send_page_view).toBe(false);
   });
 
-  it('loads gtag.js asynchronously, once', async () => {
+  it('loads gtag.js asynchronously, and only once however often init is called', async () => {
     const analytics = await loadWith(ID);
     analytics.initAnalytics();
-    analytics.__resetAnalyticsForTests();
+    // No reset between the two: this is the case that happens in production, where a stray
+    // second call must not inject a second tag and double every hit.
     analytics.initAnalytics();
 
     const scripts = document.querySelectorAll('script[src*="googletagmanager"]');
@@ -171,6 +182,9 @@ describe('with a measurement ID', () => {
     // actually governs whether the tag blocks the parser.
     expect((scripts[0] as HTMLScriptElement).async).toBe(true);
     expect(scripts[0].getAttribute('src')).toContain(ID);
+    // react-ga4 appends to body rather than head. Immaterial for an async tag, but asserted so
+    // a future change of its own is noticed rather than assumed.
+    expect(scripts[0].parentElement?.tagName).toBe('BODY');
   });
 
   it('replays a grant stored on a previous visit', async () => {

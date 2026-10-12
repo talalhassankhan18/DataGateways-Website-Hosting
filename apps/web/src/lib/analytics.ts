@@ -1,7 +1,8 @@
+import ReactGA from 'react-ga4';
 import { getConsent, hydrateConsent, subscribeToConsent } from '@/lib/consent';
 
 /**
- * Google Analytics 4, via gtag.js, under Consent Mode v2.
+ * Google Analytics 4, via react-ga4, under Consent Mode v2.
  *
  * Three properties this module is built to hold, in order of how badly each one breaks if it
  * slips:
@@ -21,10 +22,24 @@ import { getConsent, hydrateConsent, subscribeToConsent } from '@/lib/consent';
  *    partner-directory search box. Where a form is tracked, what is sent is that it happened and
  *    which branch it took.
  *
- * Why gtag.js and not Google Tag Manager: every event this site sends is declared below, in the
- * repository, where it is reviewed alongside the code that fires it. A GTM container moves that
- * out to a web console, which is the right trade when marketing needs to ship tags without a
- * deploy and the wrong one for a site with nine events and a security vendor's review burden.
+ * react-ga4 owns initialisation, page views and events. It is a thin typed wrapper over gtag.js:
+ * `event(name, params)` becomes `gtag('event', name, params)` with unmapped keys passed through
+ * untouched, and `send({hitType:'pageview'})` becomes `gtag('event','page_view', …)` with exactly
+ * the page_path / page_title / page_location shape this file already used. So the wire format is
+ * unchanged and the taxonomy below still describes what GA receives.
+ *
+ * **What react-ga4 is deliberately NOT allowed to do is the consent handshake.** Its `initialize`
+ * injects the gtag.js script *before* it pushes anything, and any `ReactGA.gtag()` call made
+ * beforehand is queued and flushed *after* `config`. Routing the Consent Mode defaults through it
+ * would therefore place them after the tag had already loaded, which is the one ordering that
+ * silently does nothing: the integration looks correct and sets cookies anyway. The defaults are
+ * pushed directly onto the dataLayer first, and `initialize` is called second — react-ga4 reuses
+ * an existing `window.dataLayer`, so the queue it inherits already has consent at the front.
+ *
+ * Why not Google Tag Manager: every event this site sends is declared below, in the repository,
+ * where it is reviewed alongside the code that fires it. A GTM container moves that out to a web
+ * console — the right trade when marketing must ship tags without a deploy, the wrong one for a
+ * site with nine events and a security vendor's review burden.
  */
 
 /* ------------------------------------------------------------------ configuration */
@@ -131,8 +146,6 @@ type ParamsFor<TName extends EventName> = Extract<AnalyticsEvent, { name: TName 
 
 /* ------------------------------------------------------------------ initialisation */
 
-const SCRIPT_ID = 'ga4-gtag';
-
 let initialised = false;
 let lastAppliedConsent: boolean | null = null;
 
@@ -192,7 +205,9 @@ const applyConsent = (granted: boolean) => {
   if (granted === lastAppliedConsent) return;
   lastAppliedConsent = granted;
 
-  window.gtag('consent', 'update', granted ? GRANTED_ON_ACCEPT : DENIED_ON_REJECT);
+  /* Safe through react-ga4: by the time consent can change, initialize() has run, so its queue
+     is drained and this reaches the dataLayer immediately rather than being deferred. */
+  ReactGA.gtag('consent', 'update', granted ? GRANTED_ON_ACCEPT : DENIED_ON_REJECT);
 
   /* Also on a denied page load, not only on an explicit withdrawal: that sweeps up a cookie left
      behind by an acceptance that has since been reset, or by a GPC signal turned on afterwards. */
@@ -211,16 +226,6 @@ const pushConsentDefaults = () => {
   });
 };
 
-const injectScript = () => {
-  if (document.getElementById(SCRIPT_ID)) return;
-
-  const script = document.createElement('script');
-  script.id = SCRIPT_ID;
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId!)}`;
-  document.head.appendChild(script);
-};
-
 /**
  * Boots analytics. Called once from `main.tsx`, before React renders.
  *
@@ -237,16 +242,18 @@ export const initAnalytics = () => {
 
   pushConsentDefaults();
 
-  window.gtag!('js', new Date());
-  window.gtag!('config', measurementId!, {
-    /* Page views are sent by hand from Meta, once per route. Left on, gtag would send one for the
-       initial document load and then nothing for any client-side navigation, so a six-page visit
-       would report as a single view of the landing route. */
-    send_page_view: false,
-    anonymize_ip: true,
+  /* Second, and only now: this injects gtag.js and pushes `js` + `config`. The dataLayer it
+     adopts already carries the consent defaults from the line above, so the tag reads them as it
+     boots. Reversing these two statements is the whole failure mode described at the top. */
+  ReactGA.initialize(measurementId!, {
+    gtagOptions: {
+      /* Page views are sent by hand from Meta, once per route. Left on, gtag would send one for
+         the initial document load and then nothing for any client-side navigation, so a six-page
+         visit would report as a single view of the landing route. */
+      send_page_view: false,
+      anonymize_ip: true,
+    },
   });
-
-  injectScript();
 
   /* A decision stored on a previous visit has to be replayed: defaults are denied on every page
      load, so without this a returning visitor who accepted last week is measured as refusing. */
@@ -266,8 +273,11 @@ export const initAnalytics = () => {
  * site rather than a field that quietly never appears in a report.
  */
 export const trackEvent = <TName extends EventName>(name: TName, params: ParamsFor<TName>) => {
-  if (!analyticsConfigured || !window.gtag) return;
-  window.gtag('event', name, params);
+  if (!analyticsConfigured) return;
+  /* react-ga4 renames a fixed list of legacy camelCase analytics.js fields and passes everything
+     else through unchanged. No parameter in the taxonomy above collides with that list, so what
+     GA receives is exactly what is declared here. */
+  ReactGA.event(name, params);
 };
 
 let lastPageViewPath: string | null = null;
@@ -291,19 +301,38 @@ export const trackPageView = (path: string, title: string) => {
   if (path === lastPageViewPath) return;
   lastPageViewPath = path;
 
-  trackEvent('page_view', {
-    page_path: path,
-    page_title: title,
+  /* Emits gtag('event','page_view', { page_path, page_title, page_location }) — the same shape
+     this file sent before react-ga4, so historical data stays comparable. */
+  ReactGA.send({
+    hitType: 'pageview',
+    page: path,
+    title,
     /* The full URL, so GA4 reads utm_* and gclid off it for attribution. No route on this site
        carries personal data in a query string; docs/ANALYTICS.md records that as a constraint on
        anyone adding one. */
-    page_location: window.location.href,
+    location: window.location.href,
   });
 };
 
 /** Records the banner decision itself, so acceptance rate is measurable. */
 export const trackConsentDecision = (state: 'granted' | 'denied') => {
   trackEvent('consent_update', { consent_state: state });
+};
+
+/**
+ * The current path as the router sees it, with any deployment base stripped.
+ *
+ * `window.location.pathname` on a GitHub Pages project site is
+ * `/DataGateways-Website-Hosting/contact`, while `page_path` on the page_view is `/contact` —
+ * the route. Reporting both shapes would put two different spellings of the same page in one
+ * property, and nothing in GA could join them.
+ */
+export const currentRoutePath = (): string => {
+  const base = import.meta.env.BASE_URL;
+  const path = window.location.pathname;
+
+  if (base && base !== '/' && path.startsWith(base)) return `/${path.slice(base.length)}`;
+  return path;
 };
 
 /* ------------------------------------------------------------------ link helpers */
@@ -357,6 +386,9 @@ export const classifyLink = (href: string): LinkClassification => {
  * store this module subscribes to and makes the two sets of tests interfere.
  */
 export const __resetAnalyticsForTests = () => {
+  /* react-ga4 is a module-level singleton that remembers isInitialized and _hasLoadedGA, so a
+     second initialize() in the same test file is a no-op without this. */
+  ReactGA.reset();
   initialised = false;
   lastAppliedConsent = null;
   lastPageViewPath = null;

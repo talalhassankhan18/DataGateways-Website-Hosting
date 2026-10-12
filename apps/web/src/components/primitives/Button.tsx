@@ -1,6 +1,6 @@
 import { Children, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { classifyLink, trackEvent } from '@/lib/analytics';
+import { classifyLink, currentRoutePath, trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 
 export type ButtonVariant = 'primary' | 'ghost';
@@ -84,7 +84,7 @@ export function Button(props: ButtonProps) {
     trackEvent('cta_click', {
       cta_label: labelOf(children, label),
       cta_destination: destination,
-      cta_location: window.location.pathname,
+      cta_location: currentRoutePath(),
     });
   };
 

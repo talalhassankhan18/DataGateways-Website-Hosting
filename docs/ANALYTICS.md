@@ -22,13 +22,13 @@ how, what is still outstanding, and what has to happen before it goes live.
 
 | | |
 | --- | --- |
-| **Method** | `gtag.js` loaded directly — no Google Tag Manager |
+| **Method** | `react-ga4` (a thin typed wrapper over `gtag.js`) — no Google Tag Manager |
 | **Consent** | Consent Mode v2, everything denied by default, banner upgrades on accept |
 | **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-G9BBDT5TQV` in `.env.production`. Unset locally, so development stays inert |
 | **Events** | 9, all declared in `apps/web/src/lib/analytics.ts` |
 | **Personal data sent** | None. Enforced by a closed parameter taxonomy and covered by tests |
 | **New tests** | 69 (web suite went from 56 to 125) |
-| **Build impact** | No new dependency. The analytics and consent code is roughly 6 KB of source |
+| **Build impact** | One dependency, `react-ga4` ^3.0.1. The analytics and consent code is roughly 6 KB of source |
 
 ### The four decisions
 
@@ -36,7 +36,8 @@ These were put to the client before anything was written, and all four were take
 recommended option:
 
 1. **Env var**, not a hardcoded ID — so the integration turns off by clearing one variable.
-2. **Direct `gtag.js`**, not Google Tag Manager.
+2. **Direct `gtag.js`**, not Google Tag Manager. *(Superseded 12 October: the client asked for
+   `react-ga4` instead. It wraps the same `gtag.js`, so the wire format is unchanged — see below.)*
 3. **Consent banner + Consent Mode v2**, not unconditional loading.
 4. **Track the contact funnel, the partner funnel, and CTA/outbound clicks** — not scroll depth,
    which GA4's own Enhanced Measurement already covers and which would have double-counted.
@@ -45,7 +46,29 @@ recommended option:
 
 ## 2. Why these choices
 
-### Why `gtag.js` and not Google Tag Manager
+### Why `react-ga4`, and what it is not allowed to do
+
+Adopted on 12 October at the client's request. It is a thin typed wrapper over `gtag.js`:
+`event(name, params)` becomes `gtag('event', name, params)` with unmapped keys passed through
+untouched, and `send({hitType:'pageview', page, title, location})` becomes
+`gtag('event','page_view', { page_path, page_title, page_location })` — exactly the shape this
+integration already sent. **The wire format did not change**, so data before and after the switch
+is directly comparable, and the taxonomy in §5 still describes what GA receives.
+
+It owns initialisation, page views and events. It is deliberately **not** allowed to perform the
+consent handshake. `ReactGA.initialize()` injects the `gtag.js` script *before* it pushes
+anything, and any `ReactGA.gtag()` call made beforehand is queued and flushed *after* `config`.
+Routing the Consent Mode defaults through it would therefore place them after the tag had already
+loaded — the one ordering that silently does nothing. So the defaults are pushed straight onto the
+`dataLayer` first and `initialize` is called second; react-ga4 reuses an existing `window.dataLayer`,
+so the queue it inherits already has consent at the front. `analytics.test.ts` asserts that order.
+
+Two smaller consequences worth knowing: react-ga4 appends its script to `<body>` rather than
+`<head>` and gives it no identifying attribute, so tests match on `src`; and its singleton survives
+`vi.resetModules()`, because vitest externalises `node_modules` — tests must call `ReactGA.reset()`
+by hand or every test after the first silently measures nothing.
+
+### Why not Google Tag Manager
 
 Every event this site sends is declared in one TypeScript file, in the repository, reviewed with
 the code that fires it. A GTM container moves that out to a web console. That is the right trade
@@ -109,6 +132,7 @@ visitor turns it off, the site falls back to asking.
 | `apps/web/src/components/layout/CookieBanner.tsx` | The banner |
 | `apps/web/src/components/layout/CookieSettingsLink.tsx` | The footer control that reopens the choice |
 | `apps/web/src/env.d.ts` | Types `import.meta.env`, so a typo in a `VITE_*` name is a build error rather than a silent `undefined` |
+| `apps/web/src/lib/asset.ts` | Resolves content asset paths against `BASE_URL`, for deployments served from a subpath |
 
 ### Files changed
 

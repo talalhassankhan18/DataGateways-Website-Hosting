@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { classifyLink, trackEvent } from '@/lib/analytics';
+import { classifyLink, currentRoutePath, trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 
 export interface ArrowLinkProps {
@@ -51,7 +51,7 @@ export function ArrowLink({ label, to, href, className, context, asText }: Arrow
          links from each other — the same reason it is in the accessible name. */
       cta_label: accessibleName ?? label,
       cta_destination: destination,
-      cta_location: window.location.pathname,
+      cta_location: currentRoutePath(),
     });
   };
 

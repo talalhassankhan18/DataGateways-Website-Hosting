@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="presentation">
+
+  <defs>
+    <radialGradient id="wash" cx="22%" cy="12%" r="95%">
+      <stop offset="0%" stop-color="#0E70F7" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#0E70F7" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#0E70F7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#0E70F7" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0E70F7" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="45%" r="78%">
+      <stop offset="55%" stop-color="#041E42" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#041E42" stop-opacity="0.8"/>
+    </radialGradient>
+    <linearGradient id="legibility" x1="0" y1="1" x2="0.55" y2="0">
+      <stop offset="0%" stop-color="#041E42" stop-opacity="0.82"/>
+      <stop offset="60%" stop-color="#041E42" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#041E42" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <linearGradient id="horizonGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0E70F7" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0E70F7" stop-opacity="0.32"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="#041E42"/>
+  <rect width="1920" height="1080" fill="url(#wash)"/>
+  <rect x="0" y="129.6" width="1920" height="373.6" fill="url(#horizonGlow)"/>
+  <g><line x1="960" y1="475.2" x2="-3264" y2="1080" stroke="#0E70F7" stroke-opacity="0.110" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-3000" y2="1080" stroke="#0E70F7" stroke-opacity="0.122" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-2736" y2="1080" stroke="#0E70F7" stroke-opacity="0.134" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-2472" y2="1080" stroke="#0E70F7" stroke-opacity="0.146" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-2208" y2="1080" stroke="#0E70F7" stroke-opacity="0.157" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-1944" y2="1080" stroke="#0E70F7" stroke-opacity="0.169" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-1680" y2="1080" stroke="#0E70F7" stroke-opacity="0.181" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-1416" y2="1080" stroke="#0E70F7" stroke-opacity="0.193" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-1152" y2="1080" stroke="#0E70F7" stroke-opacity="0.205" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-888" y2="1080" stroke="#0E70F7" stroke-opacity="0.217" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-624" y2="1080" stroke="#0E70F7" stroke-opacity="0.229" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-360" y2="1080" stroke="#0E70F7" stroke-opacity="0.241" stroke-width="1.2"/><line x1="960" y1="475.2" x2="-96" y2="1080" stroke="#0E70F7" stroke-opacity="0.253" stroke-width="1.2"/><line x1="960" y1="475.2" x2="168" y2="1080" stroke="#0E70F7" stroke-opacity="0.264" stroke-width="1.2"/><line x1="960" y1="475.2" x2="432" y2="1080" stroke="#0E70F7" stroke-opacity="0.276" stroke-width="1.2"/><line x1="960" y1="475.2" x2="696" y2="1080" stroke="#0E70F7" stroke-opacity="0.288" stroke-width="1.2"/><line x1="960" y1="475.2" x2="960" y2="1080" stroke="#0E70F7" stroke-opacity="0.300" stroke-width="1.2"/><line x1="960" y1="475.2" x2="1224" y2="1080" stroke="#0E70F7" stroke-opacity="0.288" stroke-width="1.2"/><line x1="960" y1="475.2" x2="1488" y2="1080" stroke="#0E70F7" stroke-opacity="0.276" stroke-width="1.2"/><line x1="960" y1="475.2" x2="1752" y2="1080" stroke="#0E70F7" stroke-opacity="0.264" stroke-width="1.2"/><line x1="960" y1="475.2" x2="2016" y2="1080" stroke="#0E70F7" stroke-opacity="0.253" stroke-width="1.2"/><line x1="960" y1="475.2" x2="2280" y2="1080" stroke="#0E70F7" stroke-opacity="0.241" stroke-width="1.2"/><line x1="960" y1="475.2" x2="2544" y2="1080" stroke="#0E70F7" stroke-opacity="0.229" stroke-width="1.2"/><line x1="960" y1="475.2" x2="2808" y2="1080" stroke="#0E70F7" stroke-opacity="0.217" stroke-width="1.2"/><line x1="960" y1="475.2" x2="3072" y2="1080" stroke="#0E70F7" stroke-opacity="0.205" stroke-width="1.2"/><line x1="960" y1="475.2" x2="3336" y2="1080" stroke="#0E70F7" stroke-opacity="0.193" stroke-width="1.2"/><line x1="960" y1="475.2" x2="3600" y2="1080" stroke="#0E70F7" stroke-opacity="0.181" stroke-width="1.2"/><line x1="960" y1="475.2" x2="3864" y2="1080" stroke="#0E70F7" stroke-opacity="0.169" stroke-width="1.2"/><line x1="960" y1="475.2" x2="4128" y2="1080" stroke="#0E70F7" stroke-opacity="0.157" stroke-width="1.2"/><line x1="960" y1="475.2" x2="4392" y2="1080" stroke="#0E70F7" stroke-opacity="0.146" stroke-width="1.2"/><line x1="960" y1="475.2" x2="4656" y2="1080" stroke="#0E70F7" stroke-opacity="0.134" stroke-width="1.2"/><line x1="960" y1="475.2" x2="4920" y2="1080" stroke="#0E70F7" stroke-opacity="0.122" stroke-width="1.2"/><line x1="960" y1="475.2" x2="5184" y2="1080" stroke="#0E70F7" stroke-opacity="0.110" stroke-width="1.2"/></g>
+  <g><line x1="0" y1="475.2" x2="1920" y2="475.2" stroke="#0E70F7" stroke-opacity="0.070" stroke-width="1.2"/><line x1="0" y1="475.8" x2="1920" y2="475.8" stroke="#0E70F7" stroke-opacity="0.081" stroke-width="1.2"/><line x1="0" y1="478.3" x2="1920" y2="478.3" stroke="#0E70F7" stroke-opacity="0.092" stroke-width="1.2"/><line x1="0" y1="483.4" x2="1920" y2="483.4" stroke="#0E70F7" stroke-opacity="0.103" stroke-width="1.2"/><line x1="0" y1="491.6" x2="1920" y2="491.6" stroke="#0E70F7" stroke-opacity="0.114" stroke-width="1.2"/><line x1="0" y1="503.2" x2="1920" y2="503.2" stroke="#0E70F7" stroke-opacity="0.126" stroke-width="1.2"/><line x1="0" y1="518.5" x2="1920" y2="518.5" stroke="#0E70F7" stroke-opacity="0.137" stroke-width="1.2"/><line x1="0" y1="537.9" x2="1920" y2="537.9" stroke="#0E70F7" stroke-opacity="0.148" stroke-width="1.2"/><line x1="0" y1="561.6" x2="1920" y2="561.6" stroke="#0E70F7" stroke-opacity="0.159" stroke-width="1.2"/><line x1="0" y1="589.8" x2="1920" y2="589.8" stroke="#0E70F7" stroke-opacity="0.170" stroke-width="1.2"/><line x1="0" y1="622.8" x2="1920" y2="622.8" stroke="#0E70F7" stroke-opacity="0.181" stroke-width="1.2"/><line x1="0" y1="660.7" x2="1920" y2="660.7" stroke="#0E70F7" stroke-opacity="0.192" stroke-width="1.2"/><line x1="0" y1="703.8" x2="1920" y2="703.8" stroke="#0E70F7" stroke-opacity="0.203" stroke-width="1.2"/><line x1="0" y1="752.2" x2="1920" y2="752.2" stroke="#0E70F7" stroke-opacity="0.214" stroke-width="1.2"/><line x1="0" y1="806.1" x2="1920" y2="806.1" stroke="#0E70F7" stroke-opacity="0.226" stroke-width="1.2"/><line x1="0" y1="865.7" x2="1920" y2="865.7" stroke="#0E70F7" stroke-opacity="0.237" stroke-width="1.2"/><line x1="0" y1="931.1" x2="1920" y2="931.1" stroke="#0E70F7" stroke-opacity="0.248" stroke-width="1.2"/><line x1="0" y1="1002.5" x2="1920" y2="1002.5" stroke="#0E70F7" stroke-opacity="0.259" stroke-width="1.2"/></g>
+  <line x1="0" y1="475.2" x2="1920" y2="475.2" stroke="#0E70F7" stroke-opacity="0.5" stroke-width="1.5" filter="url(#glow)"/>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+  <rect width="1920" height="1080" fill="url(#legibility)"/>
+</svg>

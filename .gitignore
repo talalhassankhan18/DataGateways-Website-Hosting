@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+!apps/web/.env.production
+
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# Media is copied into the web app at build time from /assets — the copies are not sources.
+apps/web/public/media/
+apps/web/public/logo/
+
+# Downloaded binaries (cloudflared for `npm run share`). Not sources; never committed.
+.tools/
+
+# 4K/master video kept out of git. Web encodes are generated from these into assets/media.
+assets/media/_source/

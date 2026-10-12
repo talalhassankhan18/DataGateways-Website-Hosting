@@ -1,0 +1,547 @@
+@import './tokens.css';
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: rgb(var(--hairline) / 0.08);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg-base font-sans text-body text-ink-body antialiased;
+    /* The overlay locks scroll by toggling this; declaring it here keeps the reflow predictable. */
+    overflow-x: hidden;
+  }
+
+  /*
+   * Every headline on this design is uppercase Space Grotesk set tight, as the reference sets it.
+   * Declared once here rather than repeated on each heading component.
+   */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-bold uppercase text-ink-primary;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One visible focus treatment everywhere. --accent-ink is redefined per band, so the ring stays
+     visible on the off-white page and on the blue and navy bands alike. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-ink));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.22);
+    color: rgb(var(--bg-navy));
+  }
+
+  /* Only the rail and the marquee use CSS-driven motion; everything else is framer-motion and is
+     gated in JS by useReducedMotion(). This is the belt-and-braces for the CSS half. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* The hairline rule that separates most sections, fading out at both ends rather than
+     butting into the gutter. */
+  .rule-fade {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--hairline) / 0.12) 12%,
+      rgb(var(--hairline) / 0.12) 88%,
+      transparent
+    );
+    height: 1px;
+  }
+
+  /*
+   * The hero is a dark band on a light page, so the scrim darkens toward the navy rather than
+   * fading into the background. Two passes: a floor that anchors the headline and the card strip,
+   * and a left wash that carries the type.
+   *
+   * Two jobs, split between two mechanisms, because doing both with one flat wash is what turned
+   * the hero into a blue wall:
+   *
+   *  1. The scrim below sets the mood and anchors the type. It is `--scrim`, a near-black, at
+   *     moderate alpha — enough to take the frame down without tinting it, so the clip's own
+   *     colour survives and the picture stays legible as a picture.
+   *  2. Per-glyph contrast is `.hero-ink`, a text-shadow on the type itself. Darkening the whole
+   *     frame to survive the brightest pixel behind a headline costs the entire image; shadowing
+   *     the glyphs costs nothing anywhere else.
+   *
+   * The floor that matters is 3:1, not 4.5:1 — the hero headline is 49-95px, comfortably WCAG
+   * "large text".
+   *
+   * These alphas were set by measurement, not by eye, and the measurement counts the shadow.
+   *
+   * The clip is drawn to a canvas, the two gradients are composited over it, the `.hero-ink` halo
+   * is composited on top, and the result is read along a 5px ring just outside every glyph — the
+   * background a reader actually judges the letterform against. Across six frames, worst case:
+   *
+   *     combined alpha 0.53, shadow as it was     5.04:1   (two passes ago)
+   *     combined alpha 0.36, shadow strengthened  3.93:1   <- here
+   *     combined alpha 0.26, shadow strengthened  3.12:1
+   *     combined alpha 0.16, shadow strengthened  2.56:1   fails
+   *
+   * The floor is 3:1 — WCAG large text, and the headline is 49-95px. An earlier pass measured the
+   * scrim ALONE, ignoring the halo, and so read 3.85:1 for a scrim that was really delivering
+   * 5.04:1 — which left the frame a third darker than it had to be.
+   *
+   * Two steps are available below this and both are worse than they look: 3.12:1 leaves no room
+   * for a frame brighter than the six sampled, and 2.56:1 is a plain failure. Anyone opening the
+   * footage up further should re-run the measurement rather than nudge these stops.
+   */
+  .hero-scrim {
+    background:
+      linear-gradient(
+        to top,
+        rgb(var(--scrim) / 0.66) 0%,
+        rgb(var(--scrim) / 0.36) 42%,
+        rgb(var(--scrim) / 0.24) 72%,
+        rgb(var(--scrim) / 0.32) 100%
+      ),
+      linear-gradient(
+        to right,
+        rgb(var(--scrim) / 0.34) 0%,
+        rgb(var(--scrim) / 0.2) 55%,
+        rgb(var(--scrim) / 0.06) 100%
+      );
+  }
+
+  /*
+   * Local contrast for type sitting directly on footage. Three shadows: a tight one separating
+   * the glyph edge from whatever is immediately behind it, a mid one carrying the weight, and a
+   * wide soft one lifting the whole word off a busy background.
+   *
+   * This is where the contrast budget is spent now, and it is the cheap place to spend it. Buying
+   * the same legibility from the scrim means darkening every pixel of the frame to survive the
+   * brightest one behind a headline; buying it here costs nothing anywhere the glyphs are not.
+   */
+  .hero-ink {
+    text-shadow:
+      0 1px 3px rgb(var(--scrim) / 0.9),
+      0 2px 18px rgb(var(--scrim) / 0.85),
+      0 6px 46px rgb(var(--scrim) / 0.6);
+  }
+
+  /*
+   * ---- The home hero: one centred line, with the pathway cards overlaid on its floor ----
+   *
+   * Both of these are the reference's own treatment, read off its computed styles. They are plain
+   * CSS rather than utilities because the whole effect is a height transition driven by :hover and
+   * :focus-within on a parent — a state Tailwind can only reach through stacked arbitrary variants
+   * that would be unreadable at this length.
+   */
+
+  /*
+   * Sized off the viewport rather than a type scale, and never wrapped. `nowrap` is the whole
+   * point of the treatment, so the size is capped low enough that the longest headline in the copy
+   * deck still fits at 390px. A longer one will overflow rather than reflow — that is the trade
+   * the reference makes too.
+   */
+  .hero-giant {
+    position: absolute;
+    left: 0;
+    right: 0;
+    /* Centred in the space above the cards, not in the section, so the two do not collide. */
+    top: calc(50svh + 6.5rem - (var(--cards-peek) / 2));
+    transform: translateY(-50%);
+    z-index: 3;
+    padding-inline: 2vw;
+    text-align: center;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    /* The cards beneath own every pointer event; the headline must not intercept them. */
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+
+    /*
+     * Wraps by default. `nowrap` is the reference's treatment and it is restored at lg below, but
+     * holding one line at phone width would shrink a 44-character headline to about 13px — legible
+     * in a screenshot and not in the hand.
+     */
+    text-wrap: balance;
+    font-size: clamp(1.75rem, 7vw, 3rem);
+  }
+
+  @media (min-width: 1024px) {
+    /*
+     * One line, sized so it fits whatever it says.
+     *
+     * A fixed cap only works while every headline is about the same length — the first one here
+     * was 22 characters and the cap was set for it, so a 33-character headline promptly ran off
+     * the right edge. `--hero-ch` carries the character count (set by HeroHeading) and the size
+     * falls out of it: 0.62em is the average advance of this uppercase grotesque, and 92vw leaves
+     * the gutters alone. The `min` keeps short headlines from becoming absurd.
+     */
+    .hero-giant {
+      white-space: nowrap;
+      text-wrap: nowrap;
+      font-size: min(6.6vw, 6.5rem, calc(92vw / (var(--hero-ch, 22) * 0.62)));
+    }
+  }
+
+  /* Reference: the headline steps back while a card is open, so the two never compete. */
+  .hero-cards-host:has(.hero-card:hover) .hero-giant,
+  .hero-cards-host:has(.hero-card:focus-within) .hero-giant {
+    opacity: 0.14;
+  }
+
+  /*
+   * The cue sits directly above the middle of the strip — which is exactly the space the centre
+   * cell expands into — so it retires while a cell is open, for the same reason the headline does.
+   *
+   * `!important` because framer-motion owns this element's opacity as an inline style, and an
+   * inline style outranks a stylesheet rule. The scroll-away state next to it does the same thing
+   * through Tailwind's `!opacity-0`.
+   */
+  .hero-cards-host:has(.hero-card:hover) .hero-scroll-cue,
+  .hero-cards-host:has(.hero-card:focus-within) .hero-scroll-cue {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  /*
+   * Declared on the shared ancestor, not on .hero-cards: custom properties inherit downward, and
+   * the headline is the cards' sibling. Zero below lg, where the cards sit in the flow underneath
+   * rather than over the hero floor, so the headline centres on the section instead.
+   */
+  .hero-cards-host {
+    --cards-peek: 0rem;
+  }
+
+  /* Stacked in the flow by default; the lg rule below lifts the whole strip onto the hero floor.
+     Position lives here rather than as a utility because the lg override is in this layer too, and
+     a `relative` utility would out-cascade it. */
+  .hero-cards {
+    position: relative;
+    z-index: 4;
+  }
+
+  /*
+   * Below lg the cards are a normal stacked band under the hero, fully open. Five columns of
+   * accordion in 390px would be five unreadable slivers, and there is no hover to open them with.
+   */
+  @media (min-width: 1024px) {
+    .hero-cards-host {
+      --cards-peek: 9.5rem;
+    }
+
+    .hero-cards {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      z-index: 4;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: end;
+    }
+
+    /*
+     * The closed cell is a peek, but its OPEN height is whatever its content needs — it is not a
+     * fixed value. The reference can hard-code one because its cards say a single word; ours carry
+     * a 20–30 word blurb whose wrapped height depends on the column width and the viewport, and a
+     * fixed open height silently clips the last line and the Explore cue off the bottom.
+     *
+     * `min-height` keeps the closed peek and `align-items: end` on the grid means a cell that grows
+     * does so upward, on its own, without dragging its neighbours with it.
+     */
+    .hero-card {
+      min-height: var(--cards-peek);
+      border-top: 1px solid rgb(255 255 255 / 0.28);
+      border-inline-end: 1px solid rgb(255 255 255 / 0.28);
+      transition: background-color 0.45s ease;
+    }
+
+    .hero-card:last-child {
+      border-inline-end: 0;
+    }
+
+    .hero-card:hover,
+    .hero-card:focus-within {
+      background-color: rgb(var(--accent-solid) / 0.55);
+    }
+
+    /*
+     * The detail is folded away until the cell opens. Nothing inside it is focusable — the card's
+     * only link is its title — so this hides no tab stop.
+     *
+     * The open/close is a `grid-template-rows` transition from `0fr` to `1fr`, which is the one way
+     * to animate to a content-driven height in CSS: `height: auto` is not interpolable. It needs
+     * two elements, because the row that resizes and the box that clips its overflow cannot be the
+     * same element — hence `__detail` wrapping `__detail-inner`.
+     *
+     * Where `0fr` is not supported the cell still opens, just without easing into it.
+     */
+    .hero-card__detail {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition:
+        grid-template-rows 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.45s ease 0.12s;
+    }
+
+    .hero-card__detail-inner {
+      overflow: hidden;
+      /* Without this a grid item refuses to shrink below its content, and the row never closes. */
+      min-height: 0;
+    }
+
+    .hero-card:hover .hero-card__detail,
+    .hero-card:focus-within .hero-card__detail {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    .hero-card__title,
+    .hero-card__index {
+      transform-origin: left top;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-card__title {
+      min-height: 3.15em;
+    }
+
+    .hero-card:hover .hero-card__title,
+    .hero-card:focus-within .hero-card__title {
+      transform: scale(1.12);
+    }
+
+    .hero-card:hover .hero-card__index,
+    .hero-card:focus-within .hero-card__index {
+      transform: scale(1.25);
+    }
+  }
+
+  /*
+   * Under reduced motion the cells still open — that is a disclosure, not decoration. They just do
+   * it instantly, which the global `transition-duration: 0.01ms` rule in the base layer already
+   * takes care of for both the row and the fade, so there is nothing to override here.
+   */
+
+  /*
+   * The scroll-fill statement. `--fill` (0..1) is written by ScrollFillText on scroll; every
+   * character derives its own opacity from that one value and its own index, so the sweep costs
+   * a single style write per frame no matter how long the sentence is.
+   *
+   * The `* 8` spread is how many characters are mid-fade at once — it is what makes this read as a
+   * sweep rather than as characters switching on one by one.
+   *
+   * The 0.26 floor is how visible the text is BEFORE the sweep reaches it. Low enough that the
+   * fill is still the event, high enough that the tail reads as the same sentence waiting its turn
+   * rather than as a grey ghost — at 0.18 the statement looked washed out for most of its scroll.
+   */
+  .scroll-fill {
+    --fill: 0;
+  }
+
+  .scroll-fill span[style*='--i'] {
+    opacity: clamp(0.26, calc(0.26 + 0.74 * (var(--fill) * (var(--n) + 8) - var(--i)) / 8), 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-fill span[style*='--i'] {
+      opacity: 1;
+    }
+  }
+
+  /*
+   * The auto-laid card grid. See DividedGrid, which counts its children, picks three or four
+   * across and writes the per-card spans as custom properties.
+   *
+   * One column on a phone: three or four cards across at 390px is not a layout. The spans only
+   * come into effect from tablet up, which is also why the fallbacks here are the full row width
+   * rather than the computed value — a card that somehow arrives without a span should take a
+   * whole row, not sit in a partial one next to a hole.
+   */
+  .divided-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dspm-flow-grid > li {
+    position: relative;
+    border-radius: 999px;
+    padding: 1rem 1.35rem;
+    text-align: center;
+  }
+
+  .dspm-flow-grid > li:nth-child(odd) {
+    background: rgb(var(--accent));
+    border-color: transparent;
+  }
+
+  .dspm-flow-grid > li:nth-child(odd) :is(h3, p, span) {
+    color: white;
+  }
+
+  .dspm-flow-grid > li h3 {
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+    text-transform: none;
+  }
+
+  .dspm-flow-grid > li p {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .dspm-flow-grid > li:not(:last-child)::after {
+    content: '↓';
+    position: absolute;
+    bottom: -1.8rem;
+    left: 50%;
+    z-index: 1;
+    color: theme('colors.accent.DEFAULT');
+    font-size: 1.35rem;
+    font-weight: 700;
+    transform: translateX(-50%);
+  }
+
+  .dspm-flow-grid > li:last-child::after {
+    content: none !important;
+  }
+
+  .dspm-flow-example {
+    border-radius: 0.5rem;
+    background: transparent;
+    padding: 1.75rem 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .divided-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .divided-grid > * {
+      grid-column: span var(--col-span-md, 6);
+    }
+
+    .dspm-flow-grid > li:not(:nth-child(2n))::after {
+      content: '→';
+      top: 50%;
+      right: -1.1rem;
+      bottom: auto;
+      left: auto;
+      transform: translateY(-50%);
+    }
+
+    .dspm-flow-grid > li:nth-child(2n)::after {
+      content: '↓';
+      top: auto;
+      right: auto;
+      bottom: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+  }
+
+  @media (min-width: 1024px) {
+    .divided-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .divided-grid > * {
+      grid-column: span var(--col-span, 12);
+    }
+
+    .dspm-flow-grid > li:not(:nth-child(5n))::after {
+      content: '→';
+      top: 50%;
+      right: -1.1rem;
+      bottom: auto;
+      left: auto;
+      transform: translateY(-50%);
+    }
+
+  }
+
+  /*
+   * A branch of the mobile menu.
+   *
+   * `grid-template-rows: 0fr -> 1fr` is the one way to animate to a content-driven height in CSS;
+   * `height: auto` does not interpolate. It needs two elements, because the row that resizes and
+   * the box that clips its overflow cannot be the same one.
+   *
+   * `visibility` is the part that is easy to miss. `overflow: hidden` on a zero-height row hides
+   * the links from the eye and leaves every one of them in the tab order, so a closed menu becomes
+   * a run of invisible tab stops. `visibility: hidden` takes them out of the tab order and out of
+   * the accessibility tree, and the transition delay holds it until the collapse has finished so
+   * the links do not vanish mid-animation.
+   */
+  .menu-branch {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 0.42s;
+  }
+
+  .menu-branch[data-open='true'] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 0s;
+  }
+
+  /*
+   * Grows a small control's hit area to the 44px a fingertip needs, without growing the control.
+   *
+   * The pseudo-element is out of flow, so nothing around it moves: an inline link that reads at
+   * 25px still reads at 25px and is tapped at 44. The alternative is padding, which reaches the
+   * same 44px by pushing every neighbour 19px apart.
+   *
+   * Never put this on a link that already sits inside a card-wide stretched link — the two hit
+   * areas overlap and the inner one wins, which is how a card stops being tappable in its middle.
+   */
+  .tap-target {
+    position: relative;
+  }
+
+  .tap-target::before {
+    content: '';
+    position: absolute;
+    inset: calc((2.75rem - 100%) / -2) -0.375rem;
+    /* Only ever grows the box; a control already at 44px gets nothing. */
+    min-height: 2.75rem;
+  }
+
+  /* Edge masks for the marquee. */
+  .mask-edges {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+}

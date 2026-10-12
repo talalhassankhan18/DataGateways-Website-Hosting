@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Tints the mobile URL bar to match the hero, which is the navy band at the top of the page.
+         color-scheme is light because the page itself is: the tokens declare `color-scheme: light`
+         and the body runs on #FBFBF9. Claiming dark here only tells the browser to render form
+         controls and scrollbars dark on a light page. -->
+    <meta name="theme-color" content="#041E42" />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="icon" type="image/png" href="/logo/datagateways-mark.png" />
+    <link rel="apple-touch-icon" href="/logo/datagateways-mark.png" />
+
+    <!-- The hero headline is the LCP element, so the display face it is set in is preloaded along
+         with the UI face everything else uses. Anything beyond these two costs more than it saves.
+
+         These must stay in step with apps/web/public/fonts, which scripts/fetch-fonts.mjs fills.
+         They previously named inter-latin and instrument-serif-latin-italic — two faces dropped
+         when the design moved to Space Grotesk and Readex Pro — so every page load fetched two
+         fonts that 404 while the two that actually render were not preloaded at all. -->
+    <link
+      rel="preload"
+      href="/fonts/space-grotesk-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/readex-pro-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <title>DataGateways | Zero-Trust Data Security &amp; AI Governance</title>
+    <meta
+      name="description"
+      content="Secure every data pipeline with zero-trust encryption and govern every AI prompt in real time — from one control plane, inside your own perimeter."
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

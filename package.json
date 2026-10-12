@@ -1,0 +1,41 @@
+{
+  "name": "datagateways",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DataGateways marketing site — React frontend, Express backend.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace @datagateways/shared",
+    "dev": "npm run build:shared && concurrently -n web,api -c blue,magenta \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "npm run dev --workspace @datagateways/web",
+    "dev:api": "npm run dev --workspace @datagateways/api",
+    "build": "npm run build:shared && npm run build --workspace @datagateways/web && npm run build --workspace @datagateways/api",
+    "test": "npm run build:shared && npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "typecheck": "npm run build:shared && npm run typecheck --workspaces --if-present",
+    "share": "node scripts/share.mjs",
+    "art:generate": "node scripts/generate-hero-art.mjs",
+    "assets:sync": "node scripts/sync-assets.mjs",
+    "docs:placeholders": "node scripts/generate-placeholders.mjs",
+    "fonts:fetch": "node scripts/fetch-fonts.mjs",
+    "art:cards": "node scripts/generate-card-art.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "concurrently": "^10.0.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.12.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1"
+  }
+}

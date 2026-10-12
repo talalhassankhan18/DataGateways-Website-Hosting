@@ -1,0 +1,8 @@
+# SPA fallback for static hosts that read this file (Netlify, Cloudflare Pages).
+#
+# Every route below the root is client-side: React Router matches it in the browser, and there is
+# no file on disk at /platform/datanerve. Without this rule a static host 404s any deep link the
+# client opens, refreshes or is sent — only the bare root would work.
+#
+# `vite preview` and the dev server do their own SPA fallback and ignore this file.
+/*  /index.html  200

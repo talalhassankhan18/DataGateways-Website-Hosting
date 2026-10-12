@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" width="1600" height="1200" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="field-port" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#041E42"/>
+      <stop offset="100%" stop-color="#020E20"/>
+    </linearGradient>
+    <radialGradient id="glow-port" cx="32%" cy="16%" r="86%">
+      <stop offset="0%" stop-color="#0E70F7" stop-opacity="0.38"/>
+      <stop offset="50%" stop-color="#0E70F7" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#0E70F7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig-port" cx="50%" cy="50%" r="70%">
+      <stop offset="58%" stop-color="#020E20" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#020E20" stop-opacity="0.7"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#field-port)"/>
+  <rect width="1600" height="1200" fill="url(#glow-port)"/><path d="M800 230 L1490 600 L800 970 L110 600 Z" fill="#0E70F7" fill-opacity="0.09"/><path d="M800 230 L1490 600 L800 970 L110 600 Z" fill="none" stroke="#0E70F7" stroke-opacity="0.45" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="14 12"/><path d="M400 400 C 800 400, 800 400, 1200 400" fill="none" stroke="#0E70F7" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M400 400 C 600 400, 600 860, 800 860" fill="none" stroke="#0E70F7" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M1200 400 C 1000 400, 1000 860, 800 860" fill="none" stroke="#0E70F7" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="400" cy="400" r="140" fill="#0E70F7" fill-opacity="0.18"/><circle cx="400" cy="400" r="140" fill="none" stroke="#0E70F7" stroke-opacity="0.8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M338 355.8 L400 326 L462 355.8
+             v56.5 q0 50.6 -62 62.5
+             q-62 -11.9 -62 -62.5 z"
+          fill="#3DDBC8" fill-opacity="0.15"/>
+    <path d="M338 355.8 L400 326 L462 355.8
+             v56.5 q0 50.6 -62 62.5
+             q-62 -11.9 -62 -62.5 z"
+          fill="none" stroke="#3DDBC8" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="1200" cy="400" r="140" fill="#0E70F7" fill-opacity="0.18"/><circle cx="1200" cy="400" r="140" fill="none" stroke="#0E70F7" stroke-opacity="0.8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1216 326 l-58 88 h46 l-14 76 58 -92 h-46 z" fill="#3DDBC8" fill-opacity="0.3"/><path d="M1216 326 l-58 88 h46 l-14 76 58 -92 h-46 z" fill="none" stroke="#3DDBC8" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="800" cy="860" r="140" fill="#0E70F7" fill-opacity="0.18"/><circle cx="800" cy="860" r="140" fill="none" stroke="#0E70F7" stroke-opacity="0.8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="800" cy="850" r="62" fill="#3DDBC8" fill-opacity="0.1"/>
+  <circle cx="800" cy="850" r="62" fill="none" stroke="#3DDBC8" stroke-opacity="0.9" stroke-width="4.55" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M844.6 894.6 l40.9 40.9" fill="none" stroke="#3DDBC8" stroke-opacity="0.9" stroke-width="6.3" stroke-linecap="round" stroke-linejoin="round"/><rect width="1600" height="1200" fill="url(#vig-port)"/></svg>

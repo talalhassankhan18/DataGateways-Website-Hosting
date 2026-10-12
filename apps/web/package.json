@@ -1,0 +1,40 @@
+{
+  "name": "@datagateways/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node ../../scripts/sync-assets.mjs",
+    "dev": "vite",
+    "prebuild": "node ../../scripts/sync-assets.mjs",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@datagateways/shared": "*",
+    "framer-motion": "^11.11.17",
+    "lenis": "^1.3.26",
+    "lucide-react": "^0.462.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.4.20",
+    "jsdom": "^30.1.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
+  }
+}

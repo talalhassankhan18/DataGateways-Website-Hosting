@@ -1,0 +1,38 @@
+# Normalise line endings.
+#
+# Development happens on Windows and CI runs on Ubuntu. Without this, everything commits with CRLF
+# and every checkout on another platform shows the whole file as changed. `eol=lf` stores and
+# checks out LF everywhere; Git still hands Windows editors whatever they ask for.
+* text=auto eol=lf
+
+# Files that must keep LF regardless, because a shell or a tool reads them literally.
+*.sh            text eol=lf
+*.mjs           text eol=lf
+_redirects      text eol=lf
+
+# Binary. Listing them stops Git trying to diff or "fix" the bytes.
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.ico           binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.otf           binary
+*.mp4           binary
+*.webm          binary
+*.mov           binary
+*.zip           binary
+*.pdf           binary
+
+# SVG is text and worth diffing, but the hero plates are machine-generated and enormous — collapse
+# them in reviews so a regenerated plate does not bury the change that mattered.
+*.svg                        text eol=lf
+assets/media/hero-*.svg      linguist-generated=true
+
+# Keep GitHub's language bar describing the application, not its lockfile or its prose.
+package-lock.json            linguist-generated=true
+apps/web/src/generated/**    linguist-generated=true
+docs/**                      linguist-documentation=true

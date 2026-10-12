@@ -206,7 +206,8 @@ Written as plain statements, sourced from the client's material, but never indep
 ## 7. Analytics and cookies — added 10 October 2026
 
 > **Changed 10 October 2026: this section is no longer hypothetical.** The client supplied
-> measurement ID `G-G9BBDT5TQV` and it is set in `.env.production`. **The next production deploy
+> measurement ID `G-P817Q57NCR` (set 12 October, replacing `G-G9BBDT5TQV`) and it is set in
+> `.env.production`. **The next production deploy
 > loads Google Analytics and shows the consent banner to real visitors.** The first item below
 > was a checklist entry while the variable was empty; it is now a blocker.
 

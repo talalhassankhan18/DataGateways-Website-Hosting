@@ -54,7 +54,7 @@ the same Wi-Fi. To show it to someone on a different network, see
 
 Google Analytics 4, via gtag.js, behind a Consent Mode v2 banner.
 
-- **Production is live.** `VITE_GA_MEASUREMENT_ID=G-G9BBDT5TQV` in `apps/web/.env.production`, so
+- **Production is live.** `VITE_GA_MEASUREMENT_ID=G-P817Q57NCR` in `apps/web/.env.production`, so
   a production build loads the tag and shows the consent banner.
 - **Development is not, and cannot be by accident.** Vite does not read `.env.production` in dev,
   so `npm run dev` loads no script and makes no request. To measure locally, put a **test

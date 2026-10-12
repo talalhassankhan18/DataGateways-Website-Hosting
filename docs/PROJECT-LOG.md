@@ -3,13 +3,20 @@
 A record of what has been built, what was decided and why, what is verified, and what is still
 outstanding. Written to be read by someone picking this up cold.
 
-**Last updated:** 10 October 2026
+**Last updated:** 12 October 2026
+
+> **Analytics follow-ups, 12 October 2026.** Tracking moved to `react-ga4` at the client's
+> request — a thin wrapper over the same `gtag.js`, so the wire format is unchanged and the
+> consent handshake stays outside it (see [`ANALYTICS.md`](ANALYTICS.md)). The measurement ID
+> changed to `G-P817Q57NCR`, replacing `G-G9BBDT5TQV`; GA4 properties do not merge, so the two
+> days of data on the old ID stay there. The site also went live on GitHub Pages, which required
+> a base path, a router basename, a `404.html` fallback and resolving 72 absolute asset paths.
 
 > **Google Analytics added, 10 October 2026.** GA4 via `gtag.js`, behind a Consent Mode v2
 > banner, with the contact and partner funnels, CTA clicks and outbound links instrumented. It
 > 69 tests added; the full record is in [`ANALYTICS.md`](ANALYTICS.md).
 >
-> **Measurement ID `G-G9BBDT5TQV` supplied and set the same day**, so production is now live: the
+> **Measurement ID supplied and set the same day**, so production is now live: the
 > next deploy loads the tag and shows the banner. Development stays inert — Vite does not read
 > `.env.production` in dev mode, verified. The one outstanding item blocks that deploy: the
 > privacy policy does not name Google Analytics or list its cookies, and the drafted wording in

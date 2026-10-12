@@ -1,7 +1,9 @@
 # Google Analytics 4 — integration record
 
 **Added:** 10 October 2026
-**Measurement ID supplied:** 10 October 2026 — `G-G9BBDT5TQV`
+**Measurement ID:** `G-P817Q57NCR`, set 12 October 2026. It replaced `G-G9BBDT5TQV`, which was
+live from 10–12 October; GA4 properties do not merge, so data collected against the old ID stays
+in the old property.
 **Status:** built, tested, and **armed**. The next production deploy will load Google Analytics
 and show the consent banner to real visitors.
 
@@ -24,7 +26,7 @@ how, what is still outstanding, and what has to happen before it goes live.
 | --- | --- |
 | **Method** | `react-ga4` (a thin typed wrapper over `gtag.js`) — no Google Tag Manager |
 | **Consent** | Consent Mode v2, everything denied by default, banner upgrades on accept |
-| **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-G9BBDT5TQV` in `.env.production`. Unset locally, so development stays inert |
+| **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-P817Q57NCR`, in both `.env.production` and (at the client's request) `.env`, so development reports too — see §6 |
 | **Events** | 9, all declared in `apps/web/src/lib/analytics.ts` |
 | **Personal data sent** | None. Enforced by a closed parameter taxonomy and covered by tests |
 | **New tests** | 69 (web suite went from 56 to 125) |
@@ -172,10 +174,10 @@ is a GTM container ID (`GTM-…`) or a Universal Analytics property (`UA-…`) p
 variable, which `gtag` accepts without complaint and reports nothing against. Staying inert is
 louder than looking configured and measuring nothing.
 
-**This is the state of any local checkout**, which has no `.env.local`. It is no longer the state
-of `.env.production`, which now carries `G-G9BBDT5TQV` — so a production build is live and a
-`npm run dev` is not. That asymmetry is deliberate: it keeps development traffic out of the
-client's property without anyone having to remember a flag.
+**This is the state of a fresh clone**, which has neither `.env` nor `.env.local` — both are
+gitignored. It is not the state of this machine: `.env.production` carries `G-P817Q57NCR` and, at
+the client's request on 11 October, so does `.env`, which means `npm run dev` reports into the
+live property too. §6 covers how to undo that.
 
 ### 4.2 Consent before storage
 
@@ -311,7 +313,16 @@ no requests. This is intentional and is the state every checkout starts in.
 
 ### Measuring locally
 
-Create `apps/web/.env.local` — gitignored:
+> **Current state, 12 October: `apps/web/.env` holds the live production ID**, at the client's
+> request, so `npm run dev` reports into the real property. That file is gitignored, so it is
+> local to this machine — delete it, or blank the value, to make development inert again.
+>
+> Development traffic is indistinguishable from real visitors once it is in a property and cannot
+> be deleted selectively afterwards. Worth pairing with GA4's *internal traffic* filter
+> (Admin → Data streams → Configure tag settings → Define internal traffic) on this machine's IP.
+
+To measure against a **separate test property** instead, put its ID in `apps/web/.env.local`,
+which outranks `.env`:
 
 ```
 VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
@@ -319,20 +330,9 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 Restart the dev server; Vite reads env files at startup.
 
-> **Use a separate test GA4 property, never `G-G9BBDT5TQV`.** Development traffic is
-> indistinguishable from real visitors once it is in a property, and it cannot be deleted
-> selectively afterwards. GA4's *internal traffic* filter (Admin → Data streams → Configure tag
-> settings → Define internal traffic) is worth setting up on the client's IP as a second line of
-> defence.
-
-Two Vite behaviours make this hard to get wrong, and both are relied on deliberately:
-
-- **`npm run dev` does not read `.env.production`.** Development mode loads `.env` and
-  `.env.local` only, so the client's real ID is never picked up by a dev server. A local checkout
-  with no `.env.local` measures nothing.
-- **`.env.local` cannot leak into a production build.** Vite ranks `.env.[mode]` **above**
-  `.env.local`, so `.env.production` wins. Verified: a build with a local ID present contains
-  zero occurrences of it.
+One Vite behaviour is relied on deliberately: **`.env.local` cannot leak into a production
+build**, because Vite ranks `.env.[mode]` above `.env.local`, so `.env.production` wins.
+Verified — a build with a local ID present contains zero occurrences of it.
 
 To override a production build on purpose — as §7's verification did — use
 `.env.production.local`, which outranks both and is gitignored.
@@ -401,19 +401,20 @@ one thing a dev-server run does not exercise:
 > Done with a throwaway ID layered in via a gitignored `.env.production.local`, which Vite ranks
 > above `.env.production`. That exercised the real production code path without putting test hits
 > in the client's property. The override was removed and the bundle rebuilt afterwards —
-> confirmed to contain `G-G9BBDT5TQV` and no trace of the throwaway.
+> confirmed to contain the configured ID and no trace of the throwaway.
 >
-And the separation that keeps the client's property clean was confirmed the same day, by
-restarting `npm run dev` **with the real ID sitting in `.env.production`**:
+Separation of development from the client's property was also confirmed that day, by restarting
+`npm run dev` with the real ID in `.env.production` and nothing in `.env`. *(That separation no
+longer applies: `.env` now carries the production ID — see §6.)*
 
 | Check | Result |
 | --- | --- |
 | Banner in development | ✅ absent |
 | gtag script in development | ✅ not injected |
 | `dataLayer` in development | ✅ never created |
-| `G-G9BBDT5TQV` anywhere in the dev page | ✅ nowhere |
+| The production ID anywhere in the dev page | ✅ nowhere |
 
-> **What none of this proves** is that `G-G9BBDT5TQV` is a live, correctly configured property —
+> **What none of this proves** is that the configured ID is a live, correctly configured property —
 > that is a GA account fact, not a code fact. Confirm it in **GA4 → Reports → Realtime** on the
 > first deploy.
 
@@ -453,7 +454,7 @@ decision in memory alongside storage.
 In order.
 
 1. ~~**Create the GA4 property** and a Web data stream for `datagateways.net`.~~
-   **Done, 10 October 2026** — `G-G9BBDT5TQV`.
+   **Done** — `G-P817Q57NCR`, set 12 October 2026.
 2. ~~**Set `VITE_GA_MEASUREMENT_ID`** in `apps/web/.env.production`.~~ **Done, 10 October 2026.**
    The production bundle carries the ID and was verified serving the built output; nothing else
    in the code changed.

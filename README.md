@@ -188,6 +188,7 @@ lived, deploy `apps/web/dist` to a static host — it ships a `_redirects` file 
 | [`copy-deck.md`](docs/copy-deck.md) | Draft copy for every page, pre-split for `SplitHeading` |
 | [`content-requirements.md`](docs/content-requirements.md) | What the client still owes, section by section |
 | [`ANALYTICS.md`](docs/ANALYTICS.md) | **The GA4 integration** — what it sends, what it does not, and what is still needed before it goes live |
+| [`ANALYTICS-WALKTHROUGH.md`](docs/ANALYTICS-WALKTHROUGH.md) | Plain-English account of the analytics work: what was built, the decisions, what broke. Start here |
 | [`licences.csv`](docs/licences.csv) | One row per media file |
 | [`PLACEHOLDERS.md`](docs/PLACEHOLDERS.md) | Generated register of values still flagged in code |
 

@@ -322,6 +322,28 @@
       opacity: 1;
     }
 
+    /*
+     * Reserves blurb space so every cell opens to the SAME height.
+     *
+     * Only one cell is open at a time, so the complaint is not that open cells differ from each
+     * other on screen — it is that opening the first one gives you a 557px panel and the third a
+     * 384px one. The cause is copy: the governance blurb is 243 characters against 97 for AINerve,
+     * two and a half times the length, so its cell opens far deeper than the rest.
+     *
+     * The reservation goes on the blurb and NOT on .hero-card__detail-inner, which has to keep
+     * `min-height: 0` or the grid row can never collapse and the cells would never close.
+     *
+     * Stepped rather than one value. The longest blurb wraps to thirteen lines at 1024px and
+     * seven at 1920px, so a single worst-case reservation would leave a 150px hole under the
+     * text on a wide screen. Each number is the measured worst case at that width, in rem at
+     * the 24.75px line height.
+     *
+     * Tuned to the current copy. Shorten the governance blurb and all three come down with it.
+     */
+    .hero-card__blurb {
+      min-height: 20.25rem; /* 13 lines — worst case at 1024px */
+    }
+
     .hero-card__title,
     .hero-card__index {
       transform-origin: left top;
@@ -353,6 +375,20 @@
     .hero-card:hover .hero-card__index,
     .hero-card:focus-within .hero-card__index {
       transform: scale(1.25);
+    }
+  }
+
+  /* The blurb needs fewer lines as the column widens; without these steps the wide layout would
+     carry a 150px hole between the text and the Explore cue. */
+  @media (min-width: 1440px) {
+    .hero-card__blurb {
+      min-height: 14.25rem; /* 9 lines — worst case at 1440px */
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .hero-card__blurb {
+      min-height: 11.25rem; /* 7 lines — worst case at 1920px */
     }
   }
 

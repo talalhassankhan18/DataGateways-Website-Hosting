@@ -104,7 +104,7 @@ export function HeroCard({
             </span>
           ) : null}
 
-          <p className="mb-4 text-body-sm text-ink-secondary">{card.blurb}</p>
+          <p className="hero-card__blurb mb-4 text-body-sm text-ink-secondary">{card.blurb}</p>
 
           {card.href ? (
             <Link

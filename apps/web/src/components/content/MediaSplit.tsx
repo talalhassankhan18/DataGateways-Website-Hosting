@@ -4,6 +4,7 @@ import { Reveal } from '@/components/primitives/Reveal';
 import { SplitHeading } from '@/components/primitives/SplitHeading';
 import { AVAILABLE_MEDIA } from '@/generated/media';
 import { cn } from '@/lib/cn';
+import { asset } from '@/lib/asset';
 
 export interface MediaSplitProps {
   id?: string;
@@ -67,7 +68,7 @@ export function MediaSplit({
           )}
         >
           <img
-            src={image}
+            src={asset(image)}
             alt=""
             loading="lazy"
             decoding="async"

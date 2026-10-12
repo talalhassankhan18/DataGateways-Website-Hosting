@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { AVAILABLE_MEDIA } from '@/generated/media';
 import { useSaveData } from '@/lib/hooks';
 import type { BackdropVariant } from '@/lib/backdrop';
+import { asset } from '@/lib/asset';
 import { GenerativeBackdrop } from './GenerativeBackdrop';
 
 export interface VideoSource {
@@ -74,7 +75,7 @@ export function HeroMedia({ media }: { media: HeroMediaSpec }) {
     <>
       {posterAvailable ? (
         <motion.img
-          src={media.poster}
+          src={asset(media.poster)}
           alt=""
           // React 18 does not map the camelCase name onto the DOM attribute and warns
           // instead, so the hint is spelled the way HTML spells it.
@@ -102,13 +103,13 @@ export function HeroMedia({ media }: { media: HeroMediaSpec }) {
           loop
           playsInline
           preload="none"
-          poster={posterAvailable ? media.poster : undefined}
+          poster={posterAvailable ? asset(media.poster) : undefined}
           aria-hidden="true"
           tabIndex={-1}
           className="absolute inset-0 h-full w-full object-cover"
         >
           {sources.map((source) => (
-            <source key={source.src} src={source.src} type={source.type} />
+            <source key={source.src} src={asset(source.src)} type={source.type} />
           ))}
         </video>
       ) : null}

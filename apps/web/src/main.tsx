@@ -20,9 +20,20 @@ if (!container) throw new Error('Root element missing from index.html');
  */
 initAnalytics();
 
+/*
+ * basename must match Vite's base, or routing breaks in a way that looks like a content problem
+ * rather than a configuration one.
+ *
+ * On a GitHub Pages project site the browser's pathname is `/DataGateways-Website-Hosting/about`,
+ * while the routes here are declared as `/about`. Without a basename, React Router compares the
+ * two, matches nothing, and renders the 404 page for every URL including the home page — a site
+ * that looks deployed and is entirely unreachable.
+ *
+ * `BASE_URL` is whatever `base` was set to at build time, so the two cannot drift apart.
+ */
 createRoot(container).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>
   </StrictMode>,

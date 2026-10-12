@@ -11,6 +11,7 @@ import { SectionHeading } from '@/components/content/SectionHeading';
 import { PageShell } from '@/components/layout/PageShell';
 import { ImageHero } from '@/components/media/ImageHero';
 import { partnerRegions, partners } from '@/content/partners';
+import { asset } from '@/lib/asset';
 import { Search } from 'lucide-react';
 
 const page = partners.find;
@@ -209,7 +210,7 @@ export default function PartnerFindPage() {
                   <div className="flex h-12 items-center">
                     {listing.logoUrl ? (
                       <img
-                        src={listing.logoUrl}
+                        src={asset(listing.logoUrl)}
                         alt=""
                         loading="lazy"
                         className="h-12 max-w-40 object-contain object-left"

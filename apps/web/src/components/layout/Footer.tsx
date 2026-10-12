@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Container } from '@/components/primitives/Container';
 import { CookieSettingsLink } from '@/components/layout/CookieSettingsLink';
 import { site, type SocialLink } from '@/content/site';
+import { asset } from '@/lib/asset';
 
 const ICONS: Record<SocialLink['icon'], ComponentType<{ className?: string }>> = {
   linkedin: Linkedin,
@@ -66,7 +67,7 @@ export function Footer() {
           className="tap-target mx-auto flex w-fit items-center gap-4"
         >
           <img
-            src={site.logo.src}
+            src={asset(site.logo.src)}
             alt={site.logo.alt}
             className="h-16 w-16 sm:h-20 sm:w-20"
             width={80}

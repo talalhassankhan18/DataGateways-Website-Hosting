@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Container } from '@/components/primitives/Container';
 import { Section } from '@/components/primitives/Section';
 import { PageShell } from '@/components/layout/PageShell';
+import { asset } from '@/lib/asset';
 import { renderPolicy } from './PrivacyPage';
 
 const seo = {
@@ -15,7 +16,7 @@ export default function TermsPage() {
   useEffect(() => {
     let active = true;
 
-    fetch('/terms-and-conditions.md')
+    fetch(asset('/terms-and-conditions.md'))
       .then((response) => {
         if (!response.ok) throw new Error(`Terms and conditions request failed: ${response.status}`);
         return response.text();

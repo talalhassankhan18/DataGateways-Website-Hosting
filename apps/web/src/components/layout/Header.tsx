@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn';
 import { useHeaderState } from '@/lib/hooks';
 import { HEADER_HIDE_AT, HEADER_SOLID_AT } from '@/lib/motion';
 import { site } from '@/content/site';
+import { asset } from '@/lib/asset';
 import { FullscreenMenu } from './FullscreenMenu';
 import { NavDropdown } from './NavDropdown';
 
@@ -44,7 +45,7 @@ export function Header() {
             aria-label={site.ui.homeLink}
             className="tap-target flex shrink-0 items-center gap-3 text-ink-primary"
           >
-            <img src={site.logo.src} alt={site.logo.alt} className="h-8 w-8" width={32} height={32} />
+            <img src={asset(site.logo.src)} alt={site.logo.alt} className="h-8 w-8" width={32} height={32} />
             <span className="text-body-sm font-semibold tracking-[0.2em]">{site.wordmark}</span>
           </Link>
 

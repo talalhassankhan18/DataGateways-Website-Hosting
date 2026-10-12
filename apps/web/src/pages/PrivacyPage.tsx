@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { Container } from '@/components/primitives/Container';
 import { Section } from '@/components/primitives/Section';
 import { PageShell } from '@/components/layout/PageShell';
+import { asset } from '@/lib/asset';
 
 const seo = {
   title: 'Privacy Policy | DataGateways',
@@ -136,7 +137,7 @@ export default function PrivacyPage() {
   useEffect(() => {
     let active = true;
 
-    fetch('/privacy-policy.md')
+    fetch(asset('/privacy-policy.md'))
       .then((response) => {
         if (!response.ok) throw new Error(`Privacy policy request failed: ${response.status}`);
         return response.text();

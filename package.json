@@ -17,6 +17,7 @@
     "dev:web": "npm run dev --workspace @datagateways/web",
     "dev:api": "npm run dev --workspace @datagateways/api",
     "build": "npm run build:shared && npm run build --workspace @datagateways/web && npm run build --workspace @datagateways/api",
+    "build:pages": "npm run build:shared && npm run build --workspace @datagateways/web && node scripts/prepare-pages.mjs",
     "test": "npm run build:shared && npm run test --workspaces --if-present",
     "lint": "eslint .",
     "typecheck": "npm run build:shared && npm run typecheck --workspaces --if-present",

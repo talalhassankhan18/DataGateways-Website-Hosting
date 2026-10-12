@@ -4,6 +4,7 @@ import { ArrowLink } from '@/components/primitives/ArrowLink';
 import { RevealItem } from '@/components/primitives/Reveal';
 import { AVAILABLE_MEDIA } from '@/generated/media';
 import { site } from '@/content/site';
+import { asset } from '@/lib/asset';
 
 /** Same contract as the heroes: an image that was never synced renders nothing, not a broken box. */
 const hasMedia = (path: string) => AVAILABLE_MEDIA.includes(path);
@@ -31,7 +32,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
       {article.image && hasMedia(article.image) ? (
         <div className="aspect-[16/9] overflow-hidden bg-bg-navy">
           <img
-            src={article.image}
+            src={asset(article.image)}
             alt=""
             loading="lazy"
             decoding="async"

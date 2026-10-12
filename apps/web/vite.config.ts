@@ -24,7 +24,23 @@ const TUNNEL_HOSTS = [
   '.loca.lt',
 ];
 
+/**
+ * Public base path.
+ *
+ * Everything except GitHub Pages serves this site from a domain root, so the default is `/` and
+ * nothing changes for local development, cPanel or Netlify.
+ *
+ * A GitHub Pages *project* site is served from `https://<user>.github.io/<repo>/`, so every asset
+ * URL has to carry that prefix. Get it wrong and the page is not broken in any obvious way — the
+ * HTML loads, every script and stylesheet 404s, and you get a blank white screen with no error
+ * that names the cause. The deploy workflow sets this; it is not hardcoded, because the same
+ * build has to keep working for a custom domain, where the prefix must go away again.
+ */
+const BASE = process.env.VITE_BASE ?? '/';
+
 export default defineConfig({
+  base: BASE,
+
   plugins: [react()],
 
   resolve: {

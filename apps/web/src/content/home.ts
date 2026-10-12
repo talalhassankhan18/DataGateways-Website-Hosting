@@ -89,8 +89,13 @@ export const home = {
         index: '01',
         shortTitle: 'Data Governance',
         heading: { roman: 'Convert frameworks into', accent: 'data Intelligence' } satisfies Heading,
+        /* Trimmed to its first sentence, 12 Oct. The second enumerated ownership, quality,
+           classification, lineage, security and compliance, which took this blurb to 243
+           characters against roughly 110 for the other four — so its cell opened half again as
+           deep as theirs and was the only one the hero card had to truncate. The full sentence
+           still lives on the governance page this card links to. */
         blurb:
-          'Transform Data Governance from frameworks and policies into practical, intelligent control. Discover, understand and govern the actual data connecting ownership, quality, classification, lineage, security and compliance to real business needs.',
+          'Transform Data Governance from frameworks and policies into practical, intelligent control.',
         href: '/products/datanerve/governance',
       },
       {

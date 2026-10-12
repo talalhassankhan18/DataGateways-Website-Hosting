@@ -323,25 +323,32 @@
     }
 
     /*
-     * Reserves blurb space so every cell opens to the SAME height.
+     * A fixed line budget for the blurb: every cell opens to exactly the same depth, at every
+     * width, with no breakpoints.
      *
-     * Only one cell is open at a time, so the complaint is not that open cells differ from each
-     * other on screen — it is that opening the first one gives you a 557px panel and the third a
-     * 384px one. The cause is copy: the governance blurb is 243 characters against 97 for AINerve,
-     * two and a half times the length, so its cell opens far deeper than the rest.
+     * The previous approach reserved room for the LONGEST blurb, which meant the panel was sized
+     * by its worst case — 555px at 1024px, deep enough to swallow most of the hero — and needed a
+     * separate reservation per breakpoint because the same text wraps to thirteen lines on a
+     * narrow column and seven on a wide one.
      *
-     * The reservation goes on the blurb and NOT on .hero-card__detail-inner, which has to keep
-     * `min-height: 0` or the grid row can never collapse and the cells would never close.
+     * Budgeting lines instead inverts that. `min-height` pads a short blurb up to five lines and
+     * `line-clamp` trims a long one down to five, so the panel is the same height whatever the
+     * copy says and whatever the viewport is. The card is a teaser with an Explore link to the
+     * full page; it was never the place to print 243 characters.
      *
-     * Stepped rather than one value. The longest blurb wraps to thirteen lines at 1024px and
-     * seven at 1920px, so a single worst-case reservation would leave a 150px hole under the
-     * text on a wide screen. Each number is the measured worst case at that width, in rem at
-     * the 24.75px line height.
-     *
-     * Tuned to the current copy. Shorten the governance blurb and all three come down with it.
+     * Six lines is the budget. At 1024px the blurbs need 5, 8, 5, 6 and 6 lines, so six fits
+     * four of the five and keeps the opened cell near 380px — comfortably under half of a 900px
+     * viewport, so the headline above it stays readable instead of being covered. Only the DSPM
+     * blurb, the longest at 154 characters, trims; that is what the ellipsis and the Explore
+     * link are there for.
      */
     .hero-card__blurb {
-      min-height: 20.25rem; /* 13 lines — worst case at 1024px */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 6;
+      line-clamp: 6;
+      overflow: hidden;
+      min-height: 9.3rem; /* 6 x 24.75px line height */
     }
 
     .hero-card__title,
@@ -378,19 +385,6 @@
     }
   }
 
-  /* The blurb needs fewer lines as the column widens; without these steps the wide layout would
-     carry a 150px hole between the text and the Explore cue. */
-  @media (min-width: 1440px) {
-    .hero-card__blurb {
-      min-height: 14.25rem; /* 9 lines — worst case at 1440px */
-    }
-  }
-
-  @media (min-width: 1920px) {
-    .hero-card__blurb {
-      min-height: 11.25rem; /* 7 lines — worst case at 1920px */
-    }
-  }
 
   /*
    * Under reduced motion the cells still open — that is a disclosure, not decoration. They just do

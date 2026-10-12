@@ -1,9 +1,11 @@
 # Google Analytics 4 — integration record
 
 **Added:** 10 October 2026
-**Measurement ID:** `G-P817Q57NCR`, set 12 October 2026. It replaced `G-G9BBDT5TQV`, which was
-live from 10–12 October; GA4 properties do not merge, so data collected against the old ID stays
-in the old property.
+**Measurement ID:** `G-YEG8CLH6T0`, the property for `www.datagateways.net`.
+
+The fourth supplied: `G-G9BBDT5TQV` (live 10–12 October), `G-8NYB1W6Z6P` (never deployed — it was
+the property a failing "tag not detected" test was run from), `G-P817Q57NCR` (12 October), now
+this one. **GA4 properties do not merge**, so whatever each collected stays in it.
 **Status:** built, tested, and **armed**. The next production deploy will load Google Analytics
 and show the consent banner to real visitors.
 
@@ -26,7 +28,7 @@ how, what is still outstanding, and what has to happen before it goes live.
 | --- | --- |
 | **Method** | `react-ga4` (a thin typed wrapper over `gtag.js`) — no Google Tag Manager |
 | **Consent** | Consent Mode v2, everything denied by default, banner upgrades on accept |
-| **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-P817Q57NCR`, in both `.env.production` and (at the client's request) `.env`, so development reports too — see §6 |
+| **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-YEG8CLH6T0`, in both `.env.production` and (at the client's request) `.env`, so development reports too — see §6 |
 | **Events** | 9, all declared in `apps/web/src/lib/analytics.ts` |
 | **Personal data sent** | None. Enforced by a closed parameter taxonomy and covered by tests |
 | **New tests** | 69 (web suite went from 56 to 125) |
@@ -175,7 +177,7 @@ variable, which `gtag` accepts without complaint and reports nothing against. St
 louder than looking configured and measuring nothing.
 
 **This is the state of a fresh clone**, which has neither `.env` nor `.env.local` — both are
-gitignored. It is not the state of this machine: `.env.production` carries `G-P817Q57NCR` and, at
+gitignored. It is not the state of this machine: `.env.production` carries `G-YEG8CLH6T0` and, at
 the client's request on 11 October, so does `.env`, which means `npm run dev` reports into the
 live property too. §6 covers how to undo that.
 
@@ -454,7 +456,7 @@ decision in memory alongside storage.
 In order.
 
 1. ~~**Create the GA4 property** and a Web data stream for `datagateways.net`.~~
-   **Done** — `G-P817Q57NCR`, set 12 October 2026.
+   **Done** — `G-YEG8CLH6T0`, set 12 October 2026.
 2. ~~**Set `VITE_GA_MEASUREMENT_ID`** in `apps/web/.env.production`.~~ **Done, 10 October 2026.**
    The production bundle carries the ID and was verified serving the built output; nothing else
    in the code changed.

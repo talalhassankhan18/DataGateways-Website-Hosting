@@ -8,7 +8,7 @@ outstanding. Written to be read by someone picking this up cold.
 > **Analytics follow-ups, 12 October 2026.** Tracking moved to `react-ga4` at the client's
 > request — a thin wrapper over the same `gtag.js`, so the wire format is unchanged and the
 > consent handshake stays outside it (see [`ANALYTICS.md`](ANALYTICS.md)). The measurement ID
-> changed to `G-P817Q57NCR`, replacing `G-G9BBDT5TQV`; GA4 properties do not merge, so the two
+> changed to `G-YEG8CLH6T0`, replacing `G-G9BBDT5TQV`; GA4 properties do not merge, so the two
 > days of data on the old ID stay there. The site also went live on GitHub Pages, which required
 > a base path, a router basename, a `404.html` fallback and resolving 72 absolute asset paths.
 

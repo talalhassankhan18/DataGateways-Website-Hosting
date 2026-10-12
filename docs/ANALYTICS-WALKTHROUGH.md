@@ -19,7 +19,7 @@ live at <https://talalhassankhan18.github.io/DataGateways-Website-Hosting/>.
 
 | | |
 | --- | --- |
-| **Property** | `G-P817Q57NCR` |
+| **Property** | `G-YEG8CLH6T0` |
 | **Library** | `react-ga4` (a thin wrapper over Google's `gtag.js`) |
 | **Consent** | Consent Mode v2 — everything denied until a visitor accepts |
 | **Events** | 9, listed in §4 |
@@ -179,9 +179,14 @@ the Google script *before* it sends anything, and any consent instruction given 
 queued and delivered *after* — which would place the consent defaults too late to apply. That is
 the exact silent failure described in §5, so the defaults are still sent directly.
 
-**Changed the measurement ID to `G-P817Q57NCR` (12 October).** This is the third property. A note
-worth keeping: **GA4 properties do not merge.** The data collected against `G-G9BBDT5TQV` between
-10 and 12 October stays in that property permanently.
+**Changed the measurement ID, twice (12 October).** It now points at `G-YEG8CLH6T0`, the property
+for `www.datagateways.net`. That is the fourth ID supplied in three days. A note worth keeping:
+**GA4 properties do not merge.** Whatever each one collected stays in it — the two days of data on
+`G-G9BBDT5TQV` are not coming across.
+
+**Renamed the banner's accept button to "Accept cookies"** (it said "Accept analytics"). The body
+still names Google Analytics, which is the disclosure the GDPR wants; the button is the decision,
+and "cookies" is the word people recognise from every other banner.
 
 On that — when Google told you *"your Google tag wasn't detected"*, the integration was working
 correctly. You were testing from the setup page of a *different* property, so Google looked for a

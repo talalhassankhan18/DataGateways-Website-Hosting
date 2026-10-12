@@ -25,7 +25,11 @@ export const consent = {
       'cookies in your browser. Nothing is shared with advertisers, and the site works exactly the ' +
       'same if you decline.',
 
-    accept: 'Accept analytics',
+    /* "Accept cookies", not "Accept analytics": the visitor is being asked to allow something
+       stored on their device, and that is the word they recognise from every other banner. The
+       body above still names Google Analytics, which is the transparency the GDPR actually
+       wants — the button is the decision, the body is the disclosure. */
+    accept: 'Accept cookies',
     reject: 'Decline',
 
     /** Sits under the buttons, pointing at the page that describes the cookies in full. */

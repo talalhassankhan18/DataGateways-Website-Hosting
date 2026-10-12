@@ -36,7 +36,11 @@ const TUNNEL_HOSTS = [
  * that names the cause. The deploy workflow sets this; it is not hardcoded, because the same
  * build has to keep working for a custom domain, where the prefix must go away again.
  */
-const BASE = process.env.VITE_BASE ?? '/';
+/* Normalised to exactly one trailing slash, which Vite requires. The deploy workflow feeds this
+   straight from actions/configure-pages, whose `base_path` output is "/my-repo" for a project
+   site and the empty string for a user site or custom domain — so both "" and "/repo" and an
+   already-slashed "/repo/" all have to land correctly. */
+const BASE = `${(process.env.VITE_BASE ?? '/').replace(/\/+$/, '')}/`;
 
 export default defineConfig({
   base: BASE,

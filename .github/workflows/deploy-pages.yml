@@ -32,16 +32,17 @@ jobs:
           node-version: 22
           cache: npm
 
-      # Must come before the build: it is what turns Pages on for this repository when it is not
-      # already on, and the deploy step 404s otherwise ("Failed to create deployment"). It also
-      # reports the site's real base path, which is what the build needs.
+      # actions/configure-pages is deliberately NOT used here.
       #
-      # `enablement: true` only works where the account permits it. If this step fails, set it by
-      # hand once: repo Settings -> Pages -> Source: GitHub Actions.
-      - id: pages
-        uses: actions/configure-pages@v6
-        with:
-          enablement: true
+      # It cannot help until Pages is already enabled, and it fails the whole build either way:
+      # with `enablement: false` it throws on "Get Pages site failed", and with `enablement: true`
+      # it then tries to create the site and gets "Resource not accessible by integration",
+      # because GITHUB_TOKEN is not permitted to create a Pages site. Enabling Pages is a
+      # one-time repository setting — Settings -> Pages -> Source: GitHub Actions — and no
+      # workflow can do it for you.
+      #
+      # So the base path is derived locally instead. The build then always succeeds and produces
+      # a correct artifact; only the deploy step waits on that setting.
 
       - run: npm ci
 
@@ -51,10 +52,14 @@ jobs:
           # repo name, so this stays correct through a repo rename and through a custom domain
           # being attached — a custom domain serves from the root, where the prefix must vanish.
           #
-          # base_path is "/my-repo" for a project site and "" for a user site or custom domain.
-          # Passed through raw: vite.config.ts normalises both to a valid base, which keeps the
-          # fragile string-building out of a YAML expression that cannot be tested locally.
-          VITE_BASE: ${{ steps.pages.outputs.base_path }}
+          # A Pages project site is served from /<repo>/, so assets need that prefix. Taken from
+          # the repository name, so a rename cannot silently produce a blank page.
+          #
+          # A custom domain serves from the root instead, where the prefix must disappear. That
+          # is a repository variable rather than an edit here: set PAGES_BASE_PATH to "/" under
+          # Settings -> Secrets and variables -> Actions -> Variables. vite.config.ts normalises
+          # whatever arrives, so "/", "" and "/repo" all resolve correctly.
+          VITE_BASE: ${{ vars.PAGES_BASE_PATH || format('/{0}', github.event.repository.name) }}
         # Only the web app: the Express API in apps/api cannot run on a static host, and the site
         # already calls the external API named in apps/web/.env.production.
         run: npm run build:pages

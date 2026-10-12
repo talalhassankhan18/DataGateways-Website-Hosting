@@ -9,6 +9,13 @@ this one. **GA4 properties do not merge**, so whatever each collected stays in i
 **Status:** built, tested, and **armed**. The next production deploy will load Google Analytics
 and show the consent banner to real visitors.
 
+> **Changed 12 October: there is no longer a popup.** At the client's request the banner no
+> longer appears on load, and an absent decision is treated as permission so that analytics keeps
+> working without one. Advertising signals stay denied in every state. The banner itself still
+> exists and the footer's "Cookie settings" link opens it, so a visitor can still decline and the
+> decline is honoured and persisted — but nothing asks them first. `lib/consent.ts` holds the
+> `analyticsAllowed()` definition that this all turns on.
+
 > **One thing is now overdue rather than pending.** The privacy policy still does not name Google
 > Analytics or list its cookies (§8). While the measurement ID was empty that was an item on a
 > checklist; now that the tag is armed, the first production deploy sets cookies on consent under
@@ -27,7 +34,7 @@ how, what is still outstanding, and what has to happen before it goes live.
 | | |
 | --- | --- |
 | **Method** | `react-ga4` (a thin typed wrapper over `gtag.js`) — no Google Tag Manager |
-| **Consent** | Consent Mode v2, everything denied by default, banner upgrades on accept |
+| **Consent** | Consent Mode v2. Advertising always denied; **analytics granted unless the visitor declines** (changed 12 Oct — see below) |
 | **Measurement ID** | `VITE_GA_MEASUREMENT_ID` = `G-YEG8CLH6T0`, in both `.env.production` and (at the client's request) `.env`, so development reports too — see §6 |
 | **Events** | 9, all declared in `apps/web/src/lib/analytics.ts` |
 | **Personal data sent** | None. Enforced by a closed parameter taxonomy and covered by tests |

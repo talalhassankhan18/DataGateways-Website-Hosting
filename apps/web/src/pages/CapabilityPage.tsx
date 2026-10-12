@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { Container } from '@/components/primitives/Container';
 import { DividedGrid } from '@/components/primitives/DividedGrid';
-import { Reveal } from '@/components/primitives/Reveal';
+import { Reveal, RevealGroup, RevealItem } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
 import { ScrollFillBody } from '@/components/content/ScrollFillBody';
 import { ComparisonTable } from '@/components/content/ComparisonTable';
@@ -296,6 +296,196 @@ export default function CapabilityPage() {
               columns={page.comparison.columns}
               rows={page.comparison.rows}
             />
+          </Container>
+        </Section>
+      ) : null}
+
+      {page.riskPosture ? (
+        <Section id={page.riskPosture.id} tone="grey" labelledBy="capability-risk-posture-heading">
+          <Container>
+            <SectionHeading
+              id="capability-risk-posture-heading"
+              heading={page.riskPosture.heading}
+              eyebrow={page.riskPosture.eyebrow}
+              lead={page.riskPosture.intro}
+              className="mb-14 max-w-3xl"
+            />
+
+            {/* Five signals combining into one score, so they read as a sequence rather than a
+                set: the rail runs left to right and the last cell is filled, because it is the
+                result the other four produce. Below lg it stacks, where left-to-right stops
+                meaning anything. */}
+            <RevealGroup as="ol" className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+              {page.riskPosture.stages.map((stage, index) => {
+                const isResult = index === page.riskPosture!.stages.length - 1;
+
+                return (
+                  <RevealItem key={stage.index} as="li">
+                    <div
+                      className={cn(
+                        'flex h-full flex-col rounded-md border p-6',
+                        isResult
+                          ? 'border-accent-solid bg-accent-solid'
+                          : 'border-hairline/15 bg-bg-base',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'font-mono text-index font-semibold tracking-[0.1em]',
+                          isResult ? 'text-ink-on-accent/70' : 'text-accent-ink',
+                        )}
+                      >
+                        {stage.index}
+                      </span>
+                      <h3
+                        className={cn(
+                          'mt-3 text-body font-semibold',
+                          isResult ? 'text-ink-on-accent' : 'text-ink-primary',
+                        )}
+                      >
+                        {stage.title}
+                      </h3>
+                      <p
+                        className={cn(
+                          'mt-2 text-body-sm',
+                          isResult ? 'text-ink-on-accent/85' : 'text-ink-secondary',
+                        )}
+                      >
+                        {stage.blurb}
+                      </p>
+                    </div>
+                  </RevealItem>
+                );
+              })}
+            </RevealGroup>
+
+            <Reveal>
+              <p className="mt-8 rounded-md bg-accent-ink/10 px-7 py-5 text-body text-ink-primary">
+                <span className="font-semibold">{page.riskPosture.executivePoint.label}:</span>{' '}
+                {page.riskPosture.executivePoint.body}
+              </p>
+            </Reveal>
+          </Container>
+        </Section>
+      ) : null}
+
+      {page.assurance ? (
+        <Section id={page.assurance.id} tone="white" labelledBy="capability-assurance-heading">
+          <Container>
+            <SectionHeading
+              id="capability-assurance-heading"
+              heading={page.assurance.heading}
+              eyebrow={page.assurance.eyebrow}
+              lead={page.assurance.intro}
+              className="mb-14 max-w-3xl"
+            />
+
+            <RevealGroup as="ol" className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {page.assurance.levels.map((level) => (
+                <RevealItem key={level.index} as="li">
+                  <div className="flex h-full flex-col rounded-md border border-hairline/15 bg-bg-base p-6">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-solid text-body-sm font-semibold text-ink-on-accent">
+                      {level.index}
+                    </span>
+                    <h3 className="mt-5 text-h3 font-bold text-ink-primary">{level.title}</h3>
+                    <p className="mt-3 text-body-sm text-ink-secondary">{level.blurb}</p>
+
+                    {/* The meter is this section's whole argument — that the product says how
+                        sure it is — so it carries a real value rather than four decorative bars,
+                        and the name is on the element instead of implied by its width. */}
+                    <div className="mt-auto pt-6">
+                      <div
+                        role="meter"
+                        aria-valuenow={level.strength}
+                        aria-valuemin={1}
+                        aria-valuemax={4}
+                        aria-label={page.assurance!.scaleLabel + ': ' + level.title}
+                        className="h-1.5 w-full overflow-hidden rounded-full bg-accent/15"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="block h-full rounded-full bg-accent-solid"
+                          style={{ width: (level.strength / 4) * 100 + '%' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+
+            <div className="mt-4 flex items-center justify-between text-eyebrow uppercase tracking-[0.16em] text-ink-dim">
+              <span>{page.assurance.strongestLabel}</span>
+              <span>{page.assurance.weakestLabel}</span>
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {page.compliance ? (
+        <Section id={page.compliance.id} tone="grey" labelledBy="capability-compliance-heading">
+          <Container>
+            <SectionHeading
+              id="capability-compliance-heading"
+              heading={page.compliance.heading}
+              eyebrow={page.compliance.eyebrow}
+              lead={page.compliance.intro}
+              className="mb-14 max-w-3xl"
+            />
+
+            {/* A real table, not a grid of divs: the header row and the body row mean something
+                together, and a screen reader has to be able to say which column a cell belongs
+                to. It scrolls on its own below lg rather than squeezing six columns onto a
+                phone. */}
+            <Reveal>
+              <div className="-mx-gutter overflow-x-auto px-gutter lg:mx-0 lg:px-0">
+                <table className="w-full min-w-[56rem] border-collapse text-left">
+                  <caption className="sr-only">
+                    {page.compliance.heading.roman} {page.compliance.heading.accent}
+                  </caption>
+                  <thead>
+                    <tr className="bg-accent-solid text-ink-on-accent">
+                      {page.compliance.columns.map((column) => (
+                        <th
+                          key={column}
+                          scope="col"
+                          className="px-5 py-4 text-eyebrow font-semibold uppercase tracking-[0.14em]"
+                        >
+                          {column}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="bg-bg-base">
+                      {page.compliance.row.map((cell, index) => (
+                        <td
+                          key={cell}
+                          className={cn(
+                            'border-t border-hairline/15 px-5 py-6 align-top text-body-sm',
+                            index === 0 ? 'font-semibold text-ink-primary' : 'text-ink-secondary',
+                          )}
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </Reveal>
+
+            <RevealGroup className="mt-8 grid gap-5 lg:grid-cols-2">
+              {page.compliance.notes.map((note) => (
+                <RevealItem key={note.title}>
+                  <div className="h-full rounded-md border border-hairline/15 bg-bg-base p-7">
+                    <span aria-hidden="true" className="block h-0.5 w-10 bg-accent-solid" />
+                    <h3 className="mt-5 text-body font-semibold text-ink-primary">{note.title}</h3>
+                    <p className="mt-3 text-body-sm text-ink-secondary">{note.body}</p>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
           </Container>
         </Section>
       ) : null}

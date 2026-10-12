@@ -85,6 +85,43 @@
   }
 }
 
+/*
+ * Large displays.
+ *
+ * The layout was capped at 1440px at every size above 1024px, which is comfortable on a laptop
+ * and looks wrong on a 2560px monitor: the page sat in a 1440px column with 560px of empty
+ * background down each side, filling barely half the screen.
+ *
+ * These steps widen the shell rather than the words. Prose is held at `max-w-measure` (68ch)
+ * independently, so paragraphs keep their line length and it is the grids, cards and media that
+ * take up the extra room — which is the part that looked starved. The gutter grows with the
+ * container so the content does not drift towards the edges.
+ *
+ * It deliberately stops at 1840px. Past roughly that width a five-column card grid starts to
+ * read as scattered rather than generous, and the photography has no more resolution to give.
+ */
+@media (min-width: 1600px) {
+  :root {
+    --container-max: 1536px;
+    --gutter: 96px;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --container-max: 1680px;
+    --gutter: 112px;
+    --section-gap: 104px;
+  }
+}
+
+@media (min-width: 2400px) {
+  :root {
+    --container-max: 1840px;
+    --gutter: 128px;
+  }
+}
+
 /**
  * Tone classes.
  *

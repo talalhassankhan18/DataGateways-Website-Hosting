@@ -38,6 +38,55 @@ export interface CapabilityPage {
   readonly interpreterDomains?: readonly { readonly title: string; readonly description: string }[];
   /** A single sourced market statistic. Carries its citation, or it does not go on the page. */
   readonly callout?: { readonly figure: string; readonly claim: string; readonly source: string };
+  /**
+   * The five evidence signals that combine into one risk score, and what each contributes.
+   * From the client's "Unified Risk and Commercial Model" deck.
+   */
+  readonly riskPosture?: {
+    readonly id: string;
+    readonly eyebrow: string;
+    readonly heading: Heading;
+    readonly intro: string;
+    readonly stages: readonly {
+      readonly index: string;
+      readonly title: string;
+      readonly blurb: string;
+    }[];
+    readonly executivePoint: { readonly label: string; readonly body: string };
+  };
+
+  /**
+   * How certain a finding is. The point of the section is that the product says when it does not
+   * know, so `strength` drives a meter rather than being decoration.
+   */
+  readonly assurance?: {
+    readonly id: string;
+    readonly eyebrow: string;
+    readonly heading: Heading;
+    readonly intro: string;
+    readonly scaleLabel: string;
+    readonly strongestLabel: string;
+    readonly weakestLabel: string;
+    readonly levels: readonly {
+      readonly index: string;
+      readonly title: string;
+      readonly blurb: string;
+      /** 1 (weakest) to 4 (strongest). Rendered as the proportion of a filled bar. */
+      readonly strength: 1 | 2 | 3 | 4;
+    }[];
+  };
+
+  /** How a regulation becomes an evidenced posture, column by column. */
+  readonly compliance?: {
+    readonly id: string;
+    readonly eyebrow: string;
+    readonly heading: Heading;
+    readonly intro: string;
+    readonly columns: readonly string[];
+    readonly row: readonly string[];
+    readonly notes: readonly { readonly title: string; readonly body: string }[];
+  };
+
   /** Two columns of the same six questions, answered the old way and this way. */
   readonly comparison?: {
     readonly id: string;
@@ -380,6 +429,9 @@ const dspm: CapabilityPage = {
     { id: 'lead', label: 'Summary' },
     { id: 'flow', label: 'Data security programme' },
     { id: 'modules', label: 'Coverage' },
+    { id: 'risk-posture', label: 'Unified risk' },
+    { id: 'assurance', label: 'Evidence assurance' },
+    { id: 'compliance', label: 'Compliance mapping' },
     { id: 'controls', label: 'Remediation' },
   ],
 
@@ -392,7 +444,7 @@ const dspm: CapabilityPage = {
 
   lead: {
     id: 'lead',
-    text: 'DSPM finds overlooked data copies and shows who can reach them. It uses DataNerve taxonomy and handling rules, then feeds findings into inventory, quality, risk and reporting.',
+    text: 'Discovery,classififcation,access posture and exposure evidence with controlled remidiations through an agent and Ai based model with unified risk posture.',
   },
 
   stats: [
@@ -460,6 +512,115 @@ const dspm: CapabilityPage = {
         summary: 'Generic API mappings for explicit customer sources.',
         body: 'For the systems that matter to you and are not on anybody’s standard connector list, mapped explicitly rather than assumed.',
         features: ['Explicit source mapping', 'Read-only where supported', 'Source-health tracking'],
+      },
+    ],
+  },
+
+  /* ---- From the client's "Unified Risk and Commercial Model" deck, 12 October 2026 ----
+     Three sections, placed before Controlled remediation so the page explains how a finding is
+     scored and how certain it is before it offers to act on it. */
+
+  riskPosture: {
+    id: 'risk-posture',
+    eyebrow: 'Unified Risk and Commercial Model',
+    heading: { roman: 'Unified risk', accent: 'posture' },
+    intro:
+      'Sensitive data becomes a priority when exposure, access and protection evidence show real business risk.',
+    stages: [
+      { index: '01', title: 'Sensitive data', blurb: 'Classification and detector evidence.' },
+      {
+        index: '02',
+        title: 'Access posture',
+        blurb: 'Users, groups, guests, public links and database privileges.',
+      },
+      {
+        index: '03',
+        title: 'Exposure',
+        blurb: 'Public, broad, external, stale, privileged or orphaned access.',
+      },
+      {
+        index: '04',
+        title: 'Protection state',
+        blurb: 'Remediation, quarantine, encryption, restoration and failure evidence.',
+      },
+      {
+        index: '05',
+        title: 'Unified risk',
+        blurb: 'Prioritised finding with evidence assurance.',
+      },
+    ],
+    executivePoint: {
+      label: 'Executive point',
+      body: 'Risk scoring is evidence-aware, so leadership can distinguish critical findings from uncertain or incomplete telemetry.',
+    },
+  },
+
+  assurance: {
+    id: 'assurance',
+    eyebrow: 'Unified Risk and Commercial Model',
+    heading: { roman: 'Evidence', accent: 'assurance' },
+    intro: 'Every finding carries an assurance level so posture is never overstated.',
+    scaleLabel: 'Assurance level',
+    strongestLabel: 'Strongest',
+    weakestLabel: 'Weakest',
+    levels: [
+      {
+        index: '01',
+        title: 'Exact',
+        blurb: 'Classification and posture relate to the exact object.',
+        strength: 4,
+      },
+      {
+        index: '02',
+        title: 'Correlated',
+        blurb: 'Evidence relates to a source, resource or retained classification path.',
+        strength: 3,
+      },
+      {
+        index: '03',
+        title: 'Aggregate',
+        blurb: 'Trend and prioritisation evidence without overstating certainty.',
+        strength: 2,
+      },
+      {
+        index: '04',
+        title: 'Insufficient',
+        blurb: 'The system identifies the evidence gap instead of fabricating certainty.',
+        strength: 1,
+      },
+    ],
+  },
+
+  compliance: {
+    id: 'compliance',
+    eyebrow: 'Unified Risk and Commercial Model',
+    heading: { roman: 'Compliance and', accent: 'control mapping' },
+    intro:
+      'Each requirement is traced from the regulation through to the evidence that supports or challenges it.',
+    columns: [
+      'Regulation',
+      'Requirement',
+      'Control objective',
+      'DataNerve control',
+      'DSPM evidence',
+      'Posture',
+    ],
+    row: [
+      'GDPR, Saudi PDPL, HIPAA, PCI DSS',
+      'Article or control reference',
+      'What must be protected',
+      'Mapped capability',
+      'Classification, access, exposure',
+      'Compliant based on evidence, partial, gap or not assessed',
+    ],
+    notes: [
+      {
+        title: 'Evidence-based posture',
+        body: 'DataNerve can show where technical evidence supports or challenges a control expectation. It does not claim legal certification.',
+      },
+      {
+        title: 'Regulatory transparency',
+        body: 'Requirements outside DSPM visibility are shown as Not Assessed or Insufficient Evidence rather than counted as automatic failures.',
       },
     ],
   },

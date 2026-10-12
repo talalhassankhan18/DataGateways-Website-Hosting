@@ -2,7 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SplitHeading } from '@/components/primitives/SplitHeading';
 import { analyticsConfigured, trackConsentDecision } from '@/lib/analytics';
-import { setConsent, useConsent } from '@/lib/consent';
+import { closeConsentBanner, setConsent, useConsentBannerOpen } from '@/lib/consent';
 import { EXPO_OUT } from '@/lib/motion';
 import { consent as copy } from '@/content/consent';
 
@@ -31,10 +31,11 @@ import { consent as copy } from '@/content/consent';
  * screen reader find it on demand instead.
  */
 export function CookieBanner() {
-  const state = useConsent();
+  const open = useConsentBannerOpen();
   const reduced = useReducedMotion() ?? false;
 
   const decide = (next: 'granted' | 'denied') => {
+    closeConsentBanner();
     setConsent(next);
     /* Order matters: the store update flips gtag's consent state first, so an acceptance is
        recorded under the consent it just granted rather than against the denied default. */
@@ -58,7 +59,7 @@ export function CookieBanner() {
 
   return (
     <AnimatePresence>
-      {state === 'unset' ? (
+      {open ? (
         <motion.div
           role="region"
           aria-label={banner.landmark}

@@ -203,6 +203,19 @@ Written as plain statements, sourced from the client's material, but never indep
 
 ---
 
+## 8. DSPM compliance mapping — added 12 October 2026
+
+The DSPM page now carries a **Compliance and control mapping** section naming **GDPR, Saudi PDPL,
+HIPAA and PCI DSS**, taken from the client's "Unified Risk and Commercial Model" deck. It belongs
+with the framework claims in §1 and needs the same legal read.
+
+Two things already work in its favour and should not be edited out: the section states that
+DataNerve "does not claim legal certification", and that requirements outside DSPM visibility are
+reported as Not Assessed rather than as failures. Those sentences are the difference between a
+capability claim and a compliance claim.
+
+---
+
 ## 7. Analytics and cookies — added 10 October 2026
 
 > **Changed 10 October 2026: this section is no longer hypothetical.** The client supplied
@@ -217,6 +230,7 @@ banner included, back off.
 
 | Item | Owner | Why it is here |
 | --- | --- | --- |
+| 🔴 **No consent is asked for at all** — *blocking the next deploy* | Legal | Changed 12 October at the client's request: the banner no longer appears on load and analytics now runs by default, so an EEA/UK visitor gets a `_ga` cookie without being asked. The banner still exists and the footer's "Cookie settings" opens it, but nothing prompts. This is the ePrivacy/GDPR exposure the original design existed to avoid — it is a deliberate client decision, recorded here rather than argued |
 | 🔴 **The privacy policy does not mention Google Analytics** — *blocking the next deploy* | Legal | §3b of `privacy-policy.md` has generic cookie language but does not name the processor, the cookies or their lifetimes, which GDPR Art. 13 expects. Drafted wording is ready in [`ANALYTICS.md`](ANALYTICS.md) §8 — **it has deliberately not been pasted into the policy**, because that is counsel's text, not this repo's |
 | **Advanced vs basic consent mode** | Legal | `gtag.js` currently loads before a choice is made and sends cookieless pings. Google's own recommended setup, and defensible because nothing is stored — but if counsel wants nothing reaching Google pre-consent, the change is three lines. [`ANALYTICS.md`](ANALYTICS.md) §4.2 |
 | **Google as a processor** | Legal / Ops | GA4 transfers to the US. Needs adding to the record of processing activities, and the Google data-processing terms accepting in the account |

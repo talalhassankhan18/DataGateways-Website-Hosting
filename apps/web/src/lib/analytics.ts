@@ -1,5 +1,5 @@
 import ReactGA from 'react-ga4';
-import { getConsent, hydrateConsent, subscribeToConsent } from '@/lib/consent';
+import { analyticsAllowed, hydrateConsent, subscribeToConsent } from '@/lib/consent';
 
 /**
  * Google Analytics 4, via react-ga4, under Consent Mode v2.
@@ -215,8 +215,20 @@ const applyConsent = (granted: boolean) => {
 };
 
 const pushConsentDefaults = () => {
+  /*
+   * Analytics starts granted unless the visitor has explicitly declined.
+   *
+   * It started denied until 12 October, when the client asked for the banner to stop appearing
+   * while analytics kept working — and with nothing on screen to grant permission, a denied
+   * default would simply mean no analytics at all. The three advertising signals stay denied in
+   * every case; this site runs no advertising tags.
+   *
+   * The decision is read before this runs (initAnalytics hydrates first), so a returning visitor
+   * who declined gets a denied default rather than a grant that is corrected a moment later.
+   */
   window.gtag!('consent', 'default', {
     ...DENIED_BY_DEFAULT,
+    ...(analyticsAllowed() ? GRANTED_ON_ACCEPT : {}),
     /* Keeps click-through attribution working without a cookie: with ad_storage denied, gtag
        passes the ad click ID through the URL for the session instead of storing it. Inert today,
        and already correct if advertising is ever added. */
@@ -255,13 +267,13 @@ export const initAnalytics = () => {
     },
   });
 
-  /* A decision stored on a previous visit has to be replayed: defaults are denied on every page
-     load, so without this a returning visitor who accepted last week is measured as refusing. */
-  applyConsent(getConsent() === 'granted');
+  /* Keeps `lastAppliedConsent` in step with the default just pushed, so the first real change
+     is what triggers an update rather than a no-op repeat of the default. */
+  applyConsent(analyticsAllowed());
 
   /* Keeps gtag in step with the store for the rest of the session, whichever surface changed it:
      the banner, the footer's reset link, or a direct call. */
-  subscribeToConsent(() => applyConsent(getConsent() === 'granted'));
+  subscribeToConsent(() => applyConsent(analyticsAllowed()));
 };
 
 /* ------------------------------------------------------------------ public API */

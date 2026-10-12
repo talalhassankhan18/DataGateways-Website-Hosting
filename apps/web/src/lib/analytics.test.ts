@@ -118,7 +118,7 @@ describe('a malformed measurement ID', () => {
 describe('with a measurement ID', () => {
   const ID = 'G-TEST123456';
 
-  it('denies every consent signal before the tag loads', async () => {
+  it('denies every advertising signal before the tag loads', async () => {
     const analytics = await loadWith(ID);
     analytics.initAnalytics();
 
@@ -129,14 +129,19 @@ describe('with a measurement ID', () => {
 
     // All of them named explicitly. Google treats an unmentioned signal as granted, and the two
     // v2 additions are the ones most often left out of a "denied by default" integration.
+    //
+    // Advertising stays denied in every state this site can reach — it runs no advertising tags.
     expect(signals).toMatchObject({
       ad_storage: 'denied',
       ad_user_data: 'denied',
       ad_personalization: 'denied',
-      analytics_storage: 'denied',
-      functionality_storage: 'denied',
       personalization_storage: 'denied',
     });
+
+    // Analytics, however, now starts granted. The banner stopped appearing on 12 October at the
+    // client's request, and with nothing on screen to grant permission a denied default would
+    // have meant no analytics at all.
+    expect(signals.analytics_storage).toBe('granted');
     // Strictly necessary: denying it is not more private, it only breaks things.
     expect(signals.security_storage).toBe('granted');
   });
@@ -202,15 +207,29 @@ describe('with a measurement ID', () => {
     expect(update?.[2]).toMatchObject({ analytics_storage: 'granted' });
   });
 
-  it('does not grant analytics for a visitor who has not been asked', async () => {
+  it('grants analytics for a visitor who has not been asked', async () => {
     const analytics = await loadWith(ID);
     analytics.initAnalytics();
 
-    const granted = commandsOfType('consent').filter(
-      ([, scope, signals]) =>
-        scope === 'update' && (signals as Record<string, string>).analytics_storage === 'granted',
+    const [defaults] = commands().filter(([type, scope]) => type === 'consent' && scope === 'default');
+    // No stored decision is treated as permission, which is what lets analytics work with no
+    // banner on screen. Only an explicit decline turns it off — the next test.
+    expect((defaults[2] as Record<string, string>).analytics_storage).toBe('granted');
+  });
+
+  it('denies analytics for a visitor who declined on a previous visit', async () => {
+    window.localStorage.setItem(
+      'dg.consent.analytics',
+      JSON.stringify({ state: 'denied', at: new Date().toISOString(), version: 1 }),
     );
-    expect(granted).toHaveLength(0);
+
+    const analytics = await loadWith(ID);
+    analytics.initAnalytics();
+
+    const [defaults] = commands().filter(([type, scope]) => type === 'consent' && scope === 'default');
+    // Read before the default is pushed, so a returning decline is honoured from the first
+    // command rather than granted and corrected a moment later.
+    expect((defaults[2] as Record<string, string>).analytics_storage).toBe('denied');
   });
 
   it('deletes the analytics cookies when consent is withdrawn', async () => {
@@ -218,8 +237,14 @@ describe('with a measurement ID', () => {
     document.cookie = '_ga_TEST123456=GS2.1.s1; path=/';
     expect(document.cookie).toContain('_ga=');
 
+    window.localStorage.setItem(
+      'dg.consent.analytics',
+      JSON.stringify({ state: 'denied', at: new Date().toISOString(), version: 1 }),
+    );
+
     const analytics = await loadWith(ID);
-    // No stored decision, so init applies the denied state and sweeps.
+    // A stored decline is what triggers the sweep. An absent decision no longer does, because
+    // an absent decision now means analytics may run.
     analytics.initAnalytics();
 
     // Consent Mode stops gtag using the cookie but never removes one already written, so a

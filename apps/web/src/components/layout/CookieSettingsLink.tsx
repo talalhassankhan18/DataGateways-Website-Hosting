@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { analyticsConfigured } from '@/lib/analytics';
-import { hasGlobalPrivacyControl, resetConsent } from '@/lib/consent';
+import { hasGlobalPrivacyControl, openConsentBanner } from '@/lib/consent';
 import { consent as copy } from '@/content/consent';
 
 /**
  * The permanent way back to the consent decision, in the footer's legal row.
  *
- * GDPR Article 7(3) says withdrawing consent must be as easy as giving it. A banner that never
- * returns once dismissed fails that outright, so this clears the stored decision and the banner
- * comes back.
+ * GDPR Article 7(3) says withdrawing consent must be as easy as giving it. Since 12 October the
+ * banner no longer appears on load, which makes this the ONLY route to a decision — so it opens
+ * the banner on demand rather than merely resetting a stored one.
  *
  * It announces the result because the only visible effect happens at the other end of a long
  * page: a sighted visitor at the footer sees a banner appear in the viewport, but a screen-reader
@@ -31,7 +31,7 @@ export function CookieSettingsLink() {
       return;
     }
 
-    resetConsent();
+    openConsentBanner();
     setAnnouncement(copy.settings.reopened);
   };
 

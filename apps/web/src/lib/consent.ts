@@ -4,10 +4,16 @@ import { useSyncExternalStore } from 'react';
  * Analytics consent: one decision, stored on the device, readable by React and by the analytics
  * module without either owning the other.
  *
- * Three states, and the difference between two of them matters. `unset` means nobody has been
- * asked yet, so the banner shows. `denied` means they were asked and said no, so it does not —
- * a banner that reappears on every visit is not a choice, it is attrition. `granted` is the only
- * state that unlocks `analytics_storage`.
+ * Three states. `unset` means no decision has been recorded, `granted` and `denied` mean one has.
+ *
+ * **`unset` now means analytics runs.** On 12 October the client asked for the banner to stop
+ * appearing on load while analytics kept working, so the absence of a decision is treated as
+ * permission rather than as a question to ask. Only an explicit `denied` turns collection off.
+ * That is a deliberate change from the original design and it is the reason the GDPR note in
+ * docs/PRE-LAUNCH-SIGNOFF.md got sharper: nothing now asks an EEA visitor before a cookie is set.
+ *
+ * The machinery is all still here and still works — the footer's "Cookie settings" opens the
+ * banner on demand, and a decline is honoured and persisted exactly as before.
  *
  * The decision lives in localStorage rather than a cookie precisely because it is a decision
  * *about* cookies: storing it in one would mean writing the thing being consented to before
@@ -112,6 +118,14 @@ export const hydrateConsent = () => {
   refresh();
 };
 
+/**
+ * Whether analytics may run. `unset` counts as allowed — see the note at the top of this file.
+ *
+ * Everything that gates collection asks this rather than comparing to `'granted'`, so the
+ * decision about what an absent choice means lives in exactly one place.
+ */
+export const analyticsAllowed = (): boolean => getConsent() !== 'denied';
+
 export const getConsent = (): ConsentState => {
   if (!hydrated) hydrateConsent();
   return snapshot;
@@ -145,6 +159,45 @@ export const resetConsent = () => {
     /* Nothing was stored to begin with. */
   }
   refresh();
+};
+
+/*
+ * Whether the banner is on screen, which is now independent of whether a decision exists.
+ *
+ * It used to be derived — no decision meant show it — and that is exactly what had to stop. Held
+ * in memory only and never persisted: opening it is an action the visitor takes on this page, not
+ * a preference that should survive a reload.
+ */
+let bannerOpen = false;
+const bannerListeners = new Set<() => void>();
+
+export const openConsentBanner = () => {
+  /* Nothing to decide when the browser has already refused at its own level. */
+  if (bannerOpen || hasGlobalPrivacyControl()) return;
+  bannerOpen = true;
+  bannerListeners.forEach((listener) => listener());
+};
+
+export const closeConsentBanner = () => {
+  if (!bannerOpen) return;
+  bannerOpen = false;
+  bannerListeners.forEach((listener) => listener());
+};
+
+const subscribeToBanner = (listener: () => void) => {
+  bannerListeners.add(listener);
+  return () => bannerListeners.delete(listener);
+};
+
+const getBannerOpen = () => bannerOpen;
+const getBannerServerSnapshot = () => false;
+
+export const useConsentBannerOpen = (): boolean =>
+  useSyncExternalStore(subscribeToBanner, getBannerOpen, getBannerServerSnapshot);
+
+/** Test seam: the banner flag is module state and does not reset between renders. */
+export const __closeConsentBannerForTests = () => {
+  bannerOpen = false;
 };
 
 /* Server snapshot: this app has no SSR, but useSyncExternalStore demands the argument and jsdom

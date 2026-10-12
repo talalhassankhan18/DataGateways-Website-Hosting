@@ -45,9 +45,9 @@ export const consent = {
   settings: {
     label: 'Cookie settings',
     /* Announced politely after the footer link is used, because the only visible result is a
-       banner reappearing at the other end of the page, which a screen-reader user would not
+       banner appearing at the other end of the page, which a screen-reader user would not
        otherwise know about. */
-    reopened: 'Cookie choices reset. The consent banner is available again.',
+    reopened: 'Cookie choices opened. Accept or decline below.',
   },
 
   /** Shown in place of the banner's buttons when the browser sends Global Privacy Control. */

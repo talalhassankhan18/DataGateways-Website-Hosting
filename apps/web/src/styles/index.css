@@ -328,8 +328,21 @@
       transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    /*
+     * Reserves a fixed number of title lines so every closed cell is the same height and the
+     * strip reads as one level band.
+     *
+     * Four, not three. The grid is `align-items: end`, so a cell is only as tall as its content
+     * and one that needs an extra line grows past its neighbours — which is exactly what
+     * "Data Security Posture Management" did below about 1366px, standing 30px proud of the
+     * other four. Three lines is enough for it on a wide screen and not on a narrow one, so the
+     * reservation has to cover the worst case rather than the common one.
+     *
+     * In `em`, so it tracks the clamped title size instead of assuming a pixel height. If a
+     * longer title is ever added, this is the number that has to go up with it.
+     */
     .hero-card__title {
-      min-height: 3.15em;
+      min-height: 4.2em;
     }
 
     .hero-card:hover .hero-card__title,

@@ -141,7 +141,7 @@ describe('navigation', () => {
 
   it('gives the hero slider a destination for every slide', () => {
     const dead = home.hero.slides.filter((slide) => !isResolvable(slide.href));
-    expect(dead.map((slide) => `${slide.eyebrow} -> ${slide.href}`)).toEqual([]);
+    expect(dead.map((slide) => `${slide.shortTitle} -> ${slide.href}`)).toEqual([]);
   });
 
 });

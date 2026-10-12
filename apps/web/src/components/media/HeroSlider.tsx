@@ -123,7 +123,9 @@ export function HeroSlider({ id, slides, welcome, lead, media, scrollCueTarget }
             progress={playing && index === active ? DWELL_MS : 0}
             card={{
               index: item.index,
-              tag: item.eyebrow,
+              /* No `tag`. It used to carry `eyebrow`, which every slide set to the same string as
+                 its title, so the open cell printed the same words twice. HeroCard still supports
+                 a tag — the product strip on the home page passes one that genuinely differs. */
               title: item.shortTitle,
               blurb: item.blurb,
               href: item.href,

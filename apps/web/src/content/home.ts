@@ -9,11 +9,17 @@ export interface AnchorDef {
 export interface HeroSlide {
   readonly id: string;
   readonly index: string;
-  readonly eyebrow: string;
   /**
-   * What the hero cell shows. Kept short on purpose: the closed cells are held level by a
-   * min-height, and a title that wraps to two lines pushes its own cell past that floor and
-   * leaves the strip ragged along the top. The full name lives in `eyebrow`.
+   * What the hero cell shows.
+   *
+   * There used to be an `eyebrow` beside this holding the full name, shown as a tag inside the
+   * opened cell — but every slide set the two to the same string, so the cell printed its own
+   * title twice. The eyebrow is gone and this is the single name for the area.
+   *
+   * The cells are held level by a line reservation on the title (`.hero-card__title`
+   * `min-height` in styles/index.css), currently four lines, which is what the longest of these
+   * needs at the narrowest desktop width. A longer title than those here would wrap past that
+   * and leave the strip ragged along the top again.
    */
   readonly shortTitle: string;
   readonly heading: Heading;
@@ -81,7 +87,6 @@ export const home = {
       {
         id: 'governance',
         index: '01',
-        eyebrow: 'Data Governance',
         shortTitle: 'Data Governance',
         heading: { roman: 'Convert frameworks into', accent: 'data Intelligence' } satisfies Heading,
         blurb:
@@ -91,7 +96,6 @@ export const home = {
       {
         id: 'dspm',
         index: '02',
-        eyebrow: 'Data Security Posture Management',
         shortTitle: 'Data Security Posture Management',
         heading: { roman: 'Discovery classification', accent: 'Posture management' } satisfies Heading,
         blurb:
@@ -101,7 +105,6 @@ export const home = {
       {
         id: 'ai',
         index: '03',
-        eyebrow: 'Artificial Intelligence',
         shortTitle: 'Artificial Intelligence',
         heading: { roman: 'AI that keep data', accent: 'within your organization' } satisfies Heading,
         blurb:
@@ -111,7 +114,6 @@ export const home = {
       {
         id: 'socmint',
         index: '04',
-        eyebrow: 'Social Media Intelligence',
         shortTitle: 'Social Media Intelligence',
         heading: { roman: 'Open source signal', accent: 'turned into social media intelligence' } satisfies Heading,
         blurb:
@@ -121,7 +123,6 @@ export const home = {
       {
         id: 'consultancy',
         index: '05',
-        eyebrow: 'Consultancy',
         shortTitle: 'Consultancy',
         heading: { roman: 'Experience and knowledge', accent: 'to deliver' } satisfies Heading,
         blurb:

@@ -3,7 +3,7 @@ import type { PublicPartner } from '@/lib/api';
 import { fetchPublicPartners } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
 import { Container } from '@/components/primitives/Container';
-import { RevealGroup, RevealItem } from '@/components/primitives/Reveal';
+import { Reveal } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
 import { ScrollFillBody } from '@/components/content/ScrollFillBody';
 import { CtaBand } from '@/components/content/CtaBand';
@@ -43,17 +43,30 @@ export default function PartnerFindPage() {
     };
   }, []);
 
-  const countries = useMemo(
-    () =>
-      [
-        ...new Set(
-          partners
-            .map((partner) => partner.country)
-            .filter((country): country is string => Boolean(country)),
-        ),
-      ].sort(),
-    [partners],
-  );
+  /*
+   * Only the countries that exist inside the chosen region.
+   *
+   * Built from every partner regardless of region before, which let the two filters contradict
+   * each other: pick Europe, then Japan, and the directory is guaranteed to be empty with both
+   * controls looking perfectly reasonable. Narrowing the options means a contradiction cannot be
+   * expressed, which is better than explaining it afterwards.
+   */
+  const countries = useMemo(() => {
+    const normalizedRegion = activeRegion.trim().toLowerCase();
+
+    return [
+      ...new Set(
+        partners
+          .filter(
+            (partner) =>
+              normalizedRegion === 'all' ||
+              partner.region.trim().toLowerCase() === normalizedRegion,
+          )
+          .map((partner) => partner.country)
+          .filter((country): country is string => Boolean(country)),
+      ),
+    ].sort();
+  }, [activeRegion, partners]);
   const listings = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const normalizedRegion = activeRegion.trim().toLowerCase();
@@ -107,6 +120,9 @@ export default function PartnerFindPage() {
           value={activeRegion}
           onChange={(event) => {
             setActiveRegion(event.target.value);
+            /* The country list is about to change under it, so a country chosen for the previous
+               region would survive as an invisible filter the visitor cannot see or clear. */
+            setActiveCountry('all');
             trackEvent('partner_filter', {
               filter_type: 'region',
               filter_value: event.target.value,
@@ -190,12 +206,27 @@ export default function PartnerFindPage() {
             </p>
           ) : null}
 
+            {/*
+              Each card reveals itself rather than being orchestrated by a RevealGroup.
+
+              The group variant is a one-shot: it animates its children from `hidden` to `visible`
+              when the group scrolls into view, and a card added to the list AFTER that has
+              happened mounts at `hidden` and is never told to move. Filtering to a region and
+              back put the other partners straight back into the DOM at `opacity: 0`, so the
+              directory appeared frozen on whatever the last narrower filter had shown — results
+              that were present, correct and invisible.
+
+              A self-observing Reveal cannot fail that way: a card that mounts already in the
+              viewport gets an IntersectionObserver callback for its current state and animates
+              in. Surviving cards are untouched, so only genuinely new ones fade.
+            */}
           {status === 'ready' && listings.length > 0 ? (
-            <RevealGroup as="ul" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" amount={0.1}>
+            <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {listings.map((listing) => (
-                <RevealItem
+                <Reveal
                   as="li"
                   key={listing.id}
+                  amount={0.1}
                   className="flex flex-col gap-4 rounded-sm border border-hairline/10 bg-bg-surface/50 p-6 transition-[border-color,box-shadow] duration-hover hover:border-accent/40 hover:shadow-card-hover"
                 >
                   <div className="flex items-center justify-between gap-4">
@@ -224,9 +255,9 @@ export default function PartnerFindPage() {
                     {listing.focusArea}
                     {listing.country ? ` · ${listing.country}` : ''}
                   </p>
-                </RevealItem>
+                </Reveal>
               ))}
-            </RevealGroup>
+            </ul>
           ) : null}
         </Container>
       </Section>

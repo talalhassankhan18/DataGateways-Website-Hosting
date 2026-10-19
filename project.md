@@ -10,6 +10,34 @@ rather than re-done from memory.
 
 ---
 
+## Round 8 — 19 October 2026 (Program Outcome panel overlap)
+
+| # | Request | Done | Where |
+| --- | --- | --- | --- |
+| 8.1 | The grey band overlapped the bottom of the Program Outcome panel | ✅ | `pages/CapabilityPage.tsx` |
+
+**What was wrong.** The Data Quality section carried `className="-mt-16 lg:-mt-24"`, a -96px top
+margin at `lg`. Sections are plain block elements in the flow, so a negative top margin does not
+tighten the join — it drags the whole next band up over the one above it. The grey band started
+96px before the light band ended, and painted over the last 68px of the Program Outcome panel
+including its bottom border.
+
+Measured on `/products/datanerve/governance` at 1440x900, before: `#management` ran to 2785 while
+`#data-quality` began at 2689. After: no section on the page overlaps its neighbour, and the
+panel clears the next band by 88px — exactly the `py-section` padding every other band uses.
+
+**Where it came from.** This change log, Round 5 (commit `9460057`, earlier the same day). It was
+the only negative margin on a `Section` anywhere in the app, and the comment above it explained
+only the grey tone, not the margin — so nothing recorded why the band was being pulled up. It has
+been removed rather than reduced, and the reasoning is now a comment in the file: bands are
+separated by their own padding, and if this join ever needs to be tighter, the padding is the
+thing to change.
+
+DSPM and DLP share this template and were checked too — no overlaps, and neither page has the
+panel, which belongs to the `management` block that only Data Governance defines.
+
+---
+
 ## Round 7 — 19 October 2026 (responsiveness audit)
 
 A sweep of all 16 routes at nine viewports from 320x568 to 2560x1440, checking for horizontal page

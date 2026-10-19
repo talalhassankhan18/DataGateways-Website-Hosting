@@ -226,7 +226,13 @@ export default function CapabilityPage() {
              inconsistent. */
               tone="grey"
               labelledBy="capability-quality-heading"
-              className="-mt-16 lg:-mt-24"
+              /* No negative top margin here. A `-mt-16 lg:-mt-24` was added on 19 Oct to tighten
+                 the join and it pulled this grey band 96px up over the light band above, straight
+                 across the bottom of its Program Outcome panel - the panel's lower 68px and its
+                 bottom border were painted over by the next section. It was also the only
+                 negative margin on a Section anywhere in the app, so it fought the `py-section`
+                 rhythm every other band keeps. Bands are separated by their own padding; if this
+                 join ever needs to be tighter, the padding is the thing to change. */
             >
               <Container>
                 <div className="mb-14">

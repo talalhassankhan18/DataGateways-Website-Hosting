@@ -198,7 +198,7 @@ export const home = {
           { value: flag.verified('90+'), label: 'Data Quality Detectors' },
           { value: flag.verified('9+'), label: 'Regions Covered' },
           { value: flag.verified('250'), label: 'Countries & Territories' },
-          { value: flag.verified('24,000+'), label: 'Predefined Interpreters' },
+          { value: flag.verified('24,000+'), label: 'Predefined\u00a0Interpreters' },
         ],
       },
       {
@@ -208,7 +208,10 @@ export const home = {
         items: [
           { value: flag.verified('5+'), label: 'Governance Modules' },
           { value: flag.verified('15+'), label: 'Agentic Workflows' },
-          { value: flag.verified('30 to 50%'), label: 'Cost Efficiency Gain' },
+          /* Matches the AINerve page, where management replaced the cost-efficiency claim on
+             19 Oct. Leaving it here would have the homepage and the product page stating
+             different things about the same product. */
+          { value: flag.verified('100%'), label: 'On\u2011Prem\u00a0Data\u00a0Processing' },
           { value: flag.verified('<3s'), label: 'Response Time' },
         ],
       },

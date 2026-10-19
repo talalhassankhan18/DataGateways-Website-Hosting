@@ -24,15 +24,23 @@ export const parseCounter = (raw: string): ParsedCounter => {
     return { numeric: null, suffix: '', decimals: 0, raw };
   }
 
-  const match = /^(\d+(?:[.,]\d+)?)(.*)$/.exec(trimmed);
+  /*
+   * Thousands separators are grouping, not a decimal point.
+   *
+   * The comma used to be swapped for a dot before parsing, so "24,000+" was read as twenty-four
+   * point zero zero zero and rendered "24.000" — the right digits with the wrong meaning. The
+   * grouped part is matched separately from the fractional part so the two cannot be confused,
+   * and either spelling of the same figure ("24000+" or "24,000+") now produces "24,000".
+   */
+  const match = /^(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(.*)$/.exec(trimmed);
 
   if (!match) {
     return { numeric: null, suffix: '', decimals: 0, raw };
   }
 
-  const [, digits, suffix] = match;
-  const normalised = digits.replace(',', '.');
-  const decimals = normalised.includes('.') ? normalised.split('.')[1].length : 0;
+  const [, grouped, fraction, suffix] = match;
+  const normalised = fraction ? `${grouped.replace(/,/g, '')}.${fraction}` : grouped.replace(/,/g, '');
+  const decimals = fraction ? fraction.length : 0;
 
   return { numeric: Number(normalised), suffix: suffix.trim(), decimals, raw };
 };

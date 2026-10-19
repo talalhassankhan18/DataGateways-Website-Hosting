@@ -10,6 +10,67 @@ rather than re-done from memory.
 
 ---
 
+## Round 5 — 19 October 2026 (follow-up)
+
+| # | Request | Done | Where |
+| --- | --- | --- | --- |
+| 5.1 | Counter reads 24.000, should be 24,000 | ✅ | `lib/format.ts` |
+| 5.2 | Remove the lines between the stats | ✅ | `CounterSlider.tsx`, `CounterRow.tsx` |
+| 5.3 | Remove "Available now" wherever it appears | ✅ | `pages/CapabilityPage.tsx` |
+| 5.4 | AINerve: add the five AI Governance modules | ✅ | `content/products.ts`, `pages/ProductPage.tsx` |
+| 5.5 | AINerve: add the agentic workflows | ✅ | as above |
+| 5.6 | AINerve: replace Cost Efficiency with 100% On-Prem Data Processing | ✅ | `content/products.ts`, `content/home.ts` |
+| 5.7 | Find a Partner: proper dropdown back, with a search bar | ✅ | `components/content/SearchableSelect.tsx` (new) |
+| 5.8 | Check page URLs against datagateways.net | ✅ | `App.tsx` + four content files |
+
+**5.1.** My fault, introduced in round 4. `parseCounter` swapped the comma for a dot before
+parsing, so `24,000+` was read as twenty-four point zero zero zero and animated to "24.000" — the
+right digits with the wrong meaning. The parser now matches the grouped part separately from the
+fractional part, so either spelling (`24000+` or `24,000+`) renders `24,000`. Four regression
+tests added; verified against every counter value on the site.
+
+**5.2.** The hairline rules between figures were added in round 4 and removed again here, in the
+slider and in `CounterRow` so the two counter presentations still match. The label-depth
+reservation stays — that is what actually levels the row.
+
+**5.3.** The availability pill is gone from all three capability pages. `status` stays on the
+content objects (it is still true, and DLP states its date in the callout) but nothing renders it.
+
+**5.4 / 5.5.** Two new sections between Defence and Gateway. The five modules are numbered,
+because they are controls a prompt passes through in order. The fifteen agents are a plain
+divided list rather than cards — **no blurbs were written for either.** The brief gave names
+only, and a sentence invented here would read as an approved product claim.
+
+**5.6.** Replaced on the AINerve page **and** in the homepage counter band, which carried the
+same "30 to 50% Cost Efficiency Gain" figure — leaving it would have the two pages stating
+different things about the same product.
+
+**5.7.** A new `SearchableSelect`: closed it reads and announces like a select, open it shows a
+search field above the options. A native `<select>` cannot hold a search field and 249 countries
+is not a list to scroll. Escape closes and returns focus, clicking outside closes, the search
+field takes focus on open, and the options carry `listbox`/`option` roles with `aria-selected`.
+Verified: 250 options, search field present, filtering works.
+
+**5.8 — URL check.** `datagateways.net` is already serving this build (the asset hashes match).
+All sixteen routes resolve there. Two differ:
+
+| Our route | Live site | Action |
+| --- | --- | --- |
+| `/partners/become` | **301 →** `/partners/become-partner` | **Changed.** The app now serves `/partners/become-partner` and redirects the old path |
+| `/partners/login` | **302 →** `https://partner.datagateways.net/login` | **Not changed — needs your decision.** See below |
+
+The become-partner change mattered for more than tidiness: the page declared
+`/partners/become` as its canonical URL, and that URL 301s elsewhere — a page telling search
+engines its canonical address is one that redirects away.
+
+> **`/partners/login` is left alone deliberately.** The host already redirects it to
+> `partner.datagateways.net`, so production behaviour is correct today whatever the app does.
+> Pointing the nav at another subdomain in-app is an authentication decision rather than a URL
+> correction, and if that redirect is a temporary arrangement, hard-coding it here would outlast
+> it. Say the word and it is one line.
+
+---
+
 ## Round 4 — 19 October 2026 (management email)
 
 Every numbered point from the email, with what was done.
@@ -194,7 +255,7 @@ rule during this round and moved out.
 
 ### Verification run for this round
 
-- **151 tests** (16 API, 135 web) — 1 failure, the pre-existing one above
+- **155 tests** (16 API, 139 web) — 1 failure, the pre-existing one above
 - **0 TypeScript errors**
 - **Lint unchanged** — 1 error, 1 warning, both pre-existing
 - **Production build clean**

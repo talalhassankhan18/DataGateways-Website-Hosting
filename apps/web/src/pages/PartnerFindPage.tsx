@@ -14,6 +14,7 @@ import { partnerRegions, partners } from '@/content/partners';
 import { COUNTRIES } from '@/content/countries';
 import { asset } from '@/lib/asset';
 import { Search } from 'lucide-react';
+import { SearchableSelect } from '@/components/content/SearchableSelect';
 
 const page = partners.find;
 
@@ -77,25 +78,15 @@ export default function PartnerFindPage() {
         !normalizedQuery ||
         partner.company.toLowerCase().includes(normalizedQuery) ||
         partner.focusArea.toLowerCase().includes(normalizedQuery);
-      /*
-       * Substring, not equality.
-       *
-       * Both controls are typed now rather than picked, so a half-finished word has to behave
-       * sensibly: typing "ger" should narrow towards Germany, not empty the directory and leave
-       * the visitor thinking there is nobody there. An empty box means no filter.
-       */
+      /* Exact again: the control hands back a whole option or the empty string, never a
+         half-typed word, so there is nothing to be forgiving about. Empty means no filter. */
       const matchesRegion =
-        !normalizedRegion || partner.region.trim().toLowerCase().includes(normalizedRegion);
+        !normalizedRegion || partner.region.trim().toLowerCase() === normalizedRegion;
       const matchesCountry =
-        !normalizedCountry ||
-        (partner.country?.trim().toLowerCase() ?? '').includes(normalizedCountry);
+        !normalizedCountry || (partner.country?.trim().toLowerCase() ?? '') === normalizedCountry;
       return matchesQuery && matchesRegion && matchesCountry;
     });
   }, [activeCountry, activeRegion, partners, query]);
-
-  const filterListId = useId();
-  const regionListId = `${filterListId}-regions`;
-  const countryListId = `${filterListId}-countries`;
 
   /*
    * One handler for both typed filters.
@@ -113,6 +104,10 @@ export default function PartnerFindPage() {
       trackEvent('partner_filter', { filter_type: filterType, filter_value: value.trim() });
     }
   };
+
+  const captionId = useId();
+  const regionCaptionId = `${captionId}-region`;
+  const countryCaptionId = `${captionId}-country`;
 
   const selectClassName =
     'h-12 w-full rounded-sm border border-hairline/15 bg-bg-surface px-4 text-body-sm text-ink-primary focus:border-accent/50';
@@ -144,48 +139,45 @@ export default function PartnerFindPage() {
         </span>
       </label>
       {/*
-        Typed with a datalist rather than a <select>.
+        A dropdown with a search field inside it, not a bare text input.
 
-        A select cannot be searched, and the country list is 249 entries long — scrolling to
-        Switzerland is not a reasonable thing to ask of anyone. A text input backed by a datalist
-        is searchable in every current browser, needs no dependency, and still exposes the whole
-        list to a keyboard and to assistive tech. Matching is by substring, so a partial entry
-        narrows rather than emptying the directory.
+        The datalist version read as an empty text box rather than as a control with a current
+        value, which is what management asked to have back on 19 Oct. A native <select> cannot
+        carry a search, and 249 countries is not a list to scroll — so the closed state looks and
+        announces like a select, and the open panel puts a search above the options. See
+        SearchableSelect for the keyboard and screen-reader behaviour a native select would
+        otherwise have given for free.
       */}
-      <label>
-        <span className={filterLabelClassName}>Region</span>
-        <input
-          type="text"
-          list={regionListId}
+      {/* A div, not a label: the control is a button and a <label> cannot be associated with
+          one. The caption carries an id and the trigger points at it instead. */}
+      <div>
+        <span id={regionCaptionId} className={filterLabelClassName}>
+          Region
+        </span>
+        <SearchableSelect
+          labelledBy={regionCaptionId}
+          label="Filter partners by region"
+          allLabel="All regions"
+          options={partnerRegions}
           value={activeRegion}
-          onChange={(event) => onFilterChange('region', event.target.value)}
-          placeholder="All regions"
-          aria-label="Filter partners by region"
-          className={selectClassName}
+          onChange={(next) => onFilterChange('region', next)}
+          searchPlaceholder="Search regions"
         />
-        <datalist id={regionListId}>
-          {partnerRegions.map((region) => (
-            <option key={region} value={region} />
-          ))}
-        </datalist>
-      </label>
-      <label>
-        <span className={filterLabelClassName}>Country</span>
-        <input
-          type="text"
-          list={countryListId}
+      </div>
+      <div>
+        <span id={countryCaptionId} className={filterLabelClassName}>
+          Country
+        </span>
+        <SearchableSelect
+          labelledBy={countryCaptionId}
+          label="Filter partners by country"
+          allLabel="All countries"
+          options={countries}
           value={activeCountry}
-          onChange={(event) => onFilterChange('country', event.target.value)}
-          placeholder="All countries"
-          aria-label="Filter partners by country"
-          className={selectClassName}
+          onChange={(next) => onFilterChange('country', next)}
+          searchPlaceholder="Search countries"
         />
-        <datalist id={countryListId}>
-          {countries.map((country) => (
-            <option key={country} value={country} />
-          ))}
-        </datalist>
-      </label>
+      </div>
     </div>
   );
 

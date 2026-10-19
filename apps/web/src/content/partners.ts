@@ -266,7 +266,7 @@ export const partners = {
       heading: { roman: 'No access', accent: 'yet?' } satisfies Heading,
       body: 'Portal accounts are created for certified partners as part of onboarding. If your organisation is in the programme but you cannot sign in, your partner manager can add you.',
       actions: [
-        { label: 'Become a partner', href: '/partners/become' },
+        { label: 'Become a partner', href: '/partners/become-partner' },
         { label: 'Contact us', href: '/contact' },
       ],
     },

@@ -11,7 +11,7 @@ const page = partners.become;
 
 export default function PartnerBecomePage() {
   return (
-    <PageShell seo={page.seo} path="/partners/become" anchors={page.anchors}>
+    <PageShell seo={page.seo} path="/partners/become-partner" anchors={page.anchors}>
       <ImageHero
         id={page.hero.id}
         eyebrow={page.hero.eyebrow}

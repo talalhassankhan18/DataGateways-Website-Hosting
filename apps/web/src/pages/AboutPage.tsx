@@ -5,6 +5,7 @@ import { ScrollFillBody } from '@/components/content/ScrollFillBody';
 import { SectionHeading } from '@/components/content/SectionHeading';
 import { PageShell } from '@/components/layout/PageShell';
 import { VideoHero } from '@/components/media/VideoHero';
+import { SplitHeading } from '@/components/primitives/SplitHeading';
 import { about } from '@/content/about';
 
 /*
@@ -65,12 +66,23 @@ export default function AboutPage() {
       <Section id={about.vision.id} tone="navy" labelledBy="about-vision-heading">
         <Container>
           <div className={COLUMNS}>
-            <SectionHeading
-              id="about-vision-heading"
-              eyebrow={about.vision.eyebrow}
-              heading={about.vision.heading}
-              className={HEADING_COLUMN}
-            />
+            <div className={HEADING_COLUMN}>
+              <Reveal>
+                <SplitHeading
+                  id="about-vision-heading"
+                  as="h2"
+                  roman={about.vision.heading.roman}
+                  accent={about.vision.heading.accent}
+                />
+                <SplitHeading
+                  as="h3"
+                  size="h3"
+                  roman={about.vision.subhead.roman}
+                  accent={about.vision.subhead.accent}
+                  className="mt-6 max-w-[20ch] !text-[clamp(1.375rem,2.2vw,1.875rem)] !leading-[1.22]"
+                />
+              </Reveal>
+            </div>
 
             <div className={BODY_COLUMN}>
               <Reveal>

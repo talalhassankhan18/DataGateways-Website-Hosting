@@ -83,7 +83,7 @@ const PRIMARY_NAV: readonly NavNode[] = [
       href: '/partners/find',
       children: [
         { label: 'Find a Partner', href: '/partners/find', summary: 'Delivery and resale, by region' },
-        { label: 'Become a Partner', href: '/partners/become', summary: 'Apply to the programme' },
+        { label: 'Become a Partner', href: '/partners/become-partner', summary: 'Apply to the programme' },
         { label: 'Login as Partner', href: '/partners/login', separated: true },
       ],
     },
@@ -161,7 +161,7 @@ export const site = {
 
     partner: [
       { label: 'Find a Partner', href: '/partners/find' },
-      { label: 'Become a Partner', href: '/partners/become' },
+      { label: 'Become a Partner', href: '/partners/become-partner' },
       { label: 'Partner Login', href: '/partners/login' },
     ] satisfies readonly LinkItem[],
 

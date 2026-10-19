@@ -13,8 +13,9 @@ export function CounterRow({ items }: CounterRowProps) {
         <RevealItem
           as="li"
           key={item.label}
-          // Divided by hairlines rather than gaps, so the row reads as one band.
-          className="border-t border-hairline/20 py-8 sm:[&:nth-child(2n+2)]:border-l sm:[&:nth-child(2n+2)]:pl-8 lg:border-t-0 lg:py-0 lg:pl-8 lg:[&:first-child]:pl-0 lg:[&:not(:first-child)]:border-l"
+          // No rules between figures — removed 19 Oct at management's request, here as well as
+          // in the slider, so the two counter presentations still match each other.
+          className="py-8 sm:pl-8 sm:[&:nth-child(2n+1)]:pl-0 lg:py-0 lg:pl-8 lg:[&:first-child]:pl-0"
         >
           <Counter item={item} index={index} />
         </RevealItem>

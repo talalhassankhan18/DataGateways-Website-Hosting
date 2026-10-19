@@ -8,6 +8,7 @@ export interface SectionHeadingProps {
   heading: Heading;
   id?: string;
   eyebrow?: string;
+  eyebrowClassName?: string;
   lead?: string;
   className?: string;
   align?: 'start' | 'center';
@@ -26,6 +27,7 @@ export function SectionHeading({
   heading,
   id,
   eyebrow,
+  eyebrowClassName,
   lead,
   className,
   align = 'start',
@@ -35,7 +37,11 @@ export function SectionHeading({
 
   return (
     <Wrapper className={cn(align === 'center' && 'mx-auto text-center', className)}>
-      {eyebrow ? <Eyebrow className={cn('mb-5', align === 'center' && 'justify-center')}>{eyebrow}</Eyebrow> : null}
+      {eyebrow ? (
+        <Eyebrow className={cn('mb-5', align === 'center' && 'justify-center', eyebrowClassName)}>
+          {eyebrow}
+        </Eyebrow>
+      ) : null}
       <SplitHeading
         id={id}
         as="h2"

@@ -14,6 +14,7 @@ import HomePage from '@/pages/HomePage';
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const PlatformPage = lazy(() => import('@/pages/PlatformPage'));
 const ProductPage = lazy(() => import('@/pages/ProductPage'));
+const AINervePage = lazy(() => import('@/pages/AINervePage'));
 const CapabilityPage = lazy(() => import('@/pages/CapabilityPage'));
 const ServicePage = lazy(() => import('@/pages/ServicePage'));
 const PartnerFindPage = lazy(() => import('@/pages/PartnerFindPage'));
@@ -89,13 +90,21 @@ export default function App() {
         <Route path="products/datanerve" element={<Navigate to="/products/datanerve/governance" replace />} />
         {/* Declared before the :slug pattern so "datanerve/governance" is not swallowed by it. */}
         <Route path="products/datanerve/:capability" element={<CapabilityPage />} />
+        {/* Declared before the :slug pattern so the dedicated AINerve page is not swallowed by it. */}
+        <Route path="products/ainerve" element={<AINervePage />} />
         <Route path="products/:slug" element={<ProductPage />} />
         <Route path="services" element={<ServicePage />} />
         <Route path="services/data" element={<Navigate to="/services#data-services" replace />} />
         <Route path="services/ai" element={<Navigate to="/services#ai-services" replace />} />
         <Route path="services/:service" element={<ServicePage />} />
         <Route path="partners/find" element={<PartnerFindPage />} />
-        <Route path="partners/become" element={<PartnerBecomePage />} />
+        {/* datagateways.net serves this at /partners/become-partner and 301s /partners/become
+            to it. The app followed the old spelling, so every internal link took the extra hop
+            and the page declared a canonical URL that redirects elsewhere — which is the sort of
+            thing that quietly costs the page its ranking. The old path is kept as a redirect so
+            anything already linking to it still lands. */}
+        <Route path="partners/become-partner" element={<PartnerBecomePage />} />
+        <Route path="partners/become" element={<Navigate to="/partners/become-partner" replace />} />
         <Route path="partners/login" element={<PartnerLoginPage />} />
         {features.resources ? <Route path="resources" element={<ResourcesPage />} /> : null}
         <Route path="contact" element={<ContactPage />} />

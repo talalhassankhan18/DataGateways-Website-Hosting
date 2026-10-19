@@ -67,6 +67,27 @@ export interface ProductPage {
     readonly intro: string;
     readonly cards: readonly IndexedCard[];
   };
+
+  /** Named capability modules, numbered. AINerve's five governance controls. */
+  readonly governanceModules?: {
+    readonly id: string;
+    readonly eyebrow: string;
+    readonly heading: Heading;
+    readonly intro: string;
+    readonly cards: readonly IndexedCard[];
+  };
+
+  /**
+   * The agents the platform ships with. A plain named list rather than cards with blurbs: there
+   * are fifteen of them and inventing a sentence for each would be inventing product claims.
+   */
+  readonly agents?: {
+    readonly id: string;
+    readonly eyebrow: string;
+    readonly heading: Heading;
+    readonly intro: string;
+    readonly items: readonly string[];
+  };
   readonly cta: CtaBandContent;
 }
 
@@ -228,6 +249,8 @@ const ainerve: ProductPage = {
     { id: 'hero', label: 'Intro' },
     { id: 'lead', label: 'Summary' },
     { id: 'tiers', label: 'Defence' },
+    { id: 'governance-modules', label: 'Governance modules' },
+    { id: 'agents', label: 'Agentic workflows' },
     { id: 'modules', label: 'Gateway' },
   ],
 
@@ -246,9 +269,60 @@ const ainerve: ProductPage = {
   stats: [
     { value: '5+', label: 'Governance modules' },
     { value: '15+', label: 'Agentic workflows' },
-    { value: '30 to 50%', label: 'Cost efficiency gain' },
+    /* Was "30 to 50% cost efficiency gain". Replaced 19 Oct: management asked for the
+       token/usage-efficiency claim to come out and the on-premise capability to lead instead. */
+    { value: '100%', label: 'On\u2011prem\u00a0data\u00a0processing' },
     { value: '<3s', label: 'Response time' },
   ],
+
+  /* ---- Added 19 October 2026 from management's AINerve brief ----
+     The five governance modules and the shipped agents. Both lists are the client's own wording;
+     no capability has been described beyond the name given, because a blurb invented here would
+     read as a product claim. */
+
+  governanceModules: {
+    id: 'governance-modules',
+    eyebrow: 'AI governance',
+    heading: { roman: 'Five modules', accent: 'between people and models' },
+    intro:
+      'Every prompt, response and tool call passes the same five controls, whichever model is behind the gateway.',
+    cards: [
+      { index: '01', title: 'Guardrails', blurb: '' },
+      { index: '02', title: 'Policy management', blurb: '' },
+      { index: '03', title: 'Role-based access control', blurb: '' },
+      { index: '04', title: 'Data leakage prevention', blurb: '' },
+      {
+        index: '05',
+        title: 'Data classification and per-tool-call authorization',
+        blurb: '',
+      },
+    ],
+  },
+
+  agents: {
+    id: 'agents',
+    eyebrow: 'Agentic workflows',
+    heading: { roman: 'Agents that run', accent: 'inside the perimeter' },
+    intro:
+      'Fifteen workflows ship with the platform, each running under the same governance as any other prompt.',
+    items: [
+      'SQL / database query agent',
+      'Translation agent',
+      'Compliance and policy checker',
+      'Contract and legal review',
+      'HR policy assistant',
+      'Invoice and expense processor',
+      'Presentation generator',
+      'Resume screener',
+      'Meeting notes and action items',
+      'Report and document drafting',
+      'Code review assistant',
+      'Security alert and log triage',
+      'Document Q&A and knowledge assistant',
+      'IT and customer support triage',
+      'Data analyst',
+    ],
+  },
 
   tiers: {
     id: 'tiers',

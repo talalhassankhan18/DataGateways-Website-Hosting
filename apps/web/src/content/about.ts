@@ -63,7 +63,8 @@ export const about = {
   vision: {
     id: 'vision',
     eyebrow: 'Our Vision',
-    heading: { roman: 'A safer, smarter,', accent: 'more intelligent digital world' } satisfies Heading,
+    heading: { roman: 'Our', accent: 'Vision' } satisfies Heading,
+    subhead: { roman: 'A safer, smarter,', accent: 'more intelligent digital world' } satisfies Heading,
     statement:
       'Turning critical gaps across Cyber Security, Data, Artificial Intelligence and Digital Intelligence into solutions for a safer, smarter world.',
     paragraphs: [

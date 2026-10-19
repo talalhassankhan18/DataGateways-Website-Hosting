@@ -44,3 +44,34 @@ describe('formatCounter', () => {
     expect(formatCounter(99.987, 2)).toBe('99.99');
   });
 });
+
+describe('a grouped figure', () => {
+  it('reads a comma as thousands, not as a decimal point', () => {
+    const parsed = parseCounter('24,000+');
+
+    // It used to swap the comma for a dot, so this value animated to "24.000" — the right
+    // digits with the wrong meaning, which is what management reported on 19 October.
+    expect(parsed.numeric).toBe(24000);
+    expect(parsed.decimals).toBe(0);
+    expect(parsed.suffix).toBe('+');
+  });
+
+  it('renders the same whichever way the figure was written', () => {
+    const grouped = parseCounter('24,000+');
+    const plain = parseCounter('24000+');
+
+    expect(formatCounter(grouped.numeric!, grouped.decimals)).toBe('24,000');
+    expect(formatCounter(plain.numeric!, plain.decimals)).toBe('24,000');
+  });
+
+  it('still treats a dot as a decimal point', () => {
+    const parsed = parseCounter('99.99+');
+
+    expect(parsed.numeric).toBe(99.99);
+    expect(parsed.decimals).toBe(2);
+  });
+
+  it('handles more than one group', () => {
+    expect(parseCounter('1,234,567').numeric).toBe(1234567);
+  });
+});

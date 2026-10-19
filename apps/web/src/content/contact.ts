@@ -151,7 +151,7 @@ export const contact = {
       },
       partner: {
         body: 'We work with a small number of integration and delivery partners. A line about your organisation and what you have in mind is enough to start.',
-        secondary: { label: 'Partner programme', href: '/partners/become' },
+        secondary: { label: 'Partner programme', href: '/partners/become-partner' },
       },
       support: {
         body: 'For anything time-sensitive in a running deployment, say so in the message and it will be escalated. Vulnerability reports are handled seriously and acknowledged.',

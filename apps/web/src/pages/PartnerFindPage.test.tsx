@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import PartnerFindPage from './PartnerFindPage';
@@ -37,17 +37,39 @@ const DIRECTORY: readonly PublicPartner[] = [
 
 const shown = () => screen.queryAllByRole('heading', { level: 3 }).map((h) => h.textContent);
 
-const regionInput = () => screen.getByLabelText('Filter partners by region');
-const countryInput = () => screen.getByLabelText('Filter partners by country');
+/*
+ * The filters are a custom dropdown, not a <select>: a trigger button that opens a panel with a
+ * search field and a listbox. Driving it means opening it, optionally searching, then choosing —
+ * which is also the sequence a visitor performs, so the tests exercise the real interaction
+ * rather than poking at state.
+ */
+const open = async (user: ReturnType<typeof userEvent.setup>, caption: 'Region' | 'Country') => {
+  await user.click(screen.getByRole('button', { name: caption }));
+  return screen.getByRole('listbox', {
+    name: `Filter partners by ${caption.toLowerCase()}`,
+  });
+};
 
-/** The controls are typed now, so clearing means emptying the box rather than picking "all". */
-const type = async (
+const pick = async (
   user: ReturnType<typeof userEvent.setup>,
-  field: HTMLElement,
-  value: string,
+  caption: 'Region' | 'Country',
+  option: string,
 ) => {
-  await user.clear(field);
-  if (value) await user.type(field, value);
+  const listbox = await open(user, caption);
+  await user.click(within(listbox).getByRole('option', { name: option }));
+};
+
+/* Named, not derived: "Country" does not pluralise to "countrys". */
+const SEARCH_PLACEHOLDER = { Region: 'Search regions', Country: 'Search countries' } as const;
+
+const search = async (
+  user: ReturnType<typeof userEvent.setup>,
+  caption: 'Region' | 'Country',
+  term: string,
+) => {
+  const listbox = await open(user, caption);
+  await user.type(screen.getByRole('searchbox', { name: SEARCH_PLACEHOLDER[caption] }), term);
+  return listbox;
 };
 
 describe('the partner directory', () => {
@@ -86,26 +108,31 @@ describe('the partner directory', () => {
   it('narrows to the chosen region', async () => {
     const user = await renderDirectory();
 
-    await type(user, regionInput(), 'Europe');
+    await pick(user, 'Region', 'Europe');
 
     expect(shown()).toEqual(['Alpha Europe', 'Beta Europe']);
   });
 
-  it('narrows on a partial entry rather than emptying the directory', async () => {
+  it('filters the option list as you search it', async () => {
     const user = await renderDirectory();
 
-    // The controls are typed, so a half-finished word has to behave sensibly on the way in.
-    await type(user, countryInput(), 'ger');
+    // The point of the search field: 249 countries is not a list to scroll.
+    const listbox = await search(user, 'Country', 'ger');
+    const visible = within(listbox)
+      .getAllByRole('option')
+      .map((option) => option.textContent?.trim());
 
-    expect(shown()).toEqual(['Alpha Europe']);
+    expect(visible).toContain('Germany');
+    expect(visible).not.toContain('Japan');
   });
 
   it('offers every country, not only the ones a partner sits in', async () => {
-    await renderDirectory();
+    const user = await renderDirectory();
 
-    const options = Array.from(
-      document.querySelectorAll<HTMLOptionElement>('datalist option'),
-    ).map((option) => option.value);
+    const listbox = await open(user, 'Country');
+    const options = within(listbox)
+      .getAllByRole('option')
+      .map((option) => option.textContent?.trim());
 
     // Management asked for the full list on 19 Oct. Countries with a partner come first.
     expect(options).toContain('Germany');
@@ -116,10 +143,10 @@ describe('the partner directory', () => {
   it('restores every partner when the region goes back to all', async () => {
     const user = await renderDirectory();
 
-    await type(user, regionInput(), 'Europe');
+    await pick(user, 'Region', 'Europe');
     expect(shown()).toHaveLength(2);
 
-    await type(user, regionInput(), '');
+    await pick(user, 'Region', 'All regions');
 
     /*
      * The reported bug. The filter arithmetic was never wrong — the partners came straight back
@@ -144,10 +171,10 @@ describe('the partner directory', () => {
 
   it('restores every partner when the country goes back to all', async () => {
     const user = await renderDirectory();
-    await type(user, countryInput(), 'Japan');
+    await pick(user, 'Country', 'Japan');
     expect(shown()).toEqual(['Gamma Asia']);
 
-    await type(user, countryInput(), '');
+    await pick(user, 'Country', 'All countries');
 
     expect(shown()).toHaveLength(DIRECTORY.length);
   });
@@ -155,8 +182,8 @@ describe('the partner directory', () => {
   it('combines region and country while both are set', async () => {
     const user = await renderDirectory();
 
-    await type(user, regionInput(), 'Asia');
-    await type(user, countryInput(), 'Japan');
+    await pick(user, 'Region', 'Asia');
+    await pick(user, 'Country', 'Japan');
 
     expect(shown()).toEqual(['Gamma Asia']);
   });
@@ -166,8 +193,8 @@ describe('the partner directory', () => {
 
     // Now that every country is offered, Europe plus Japan is expressible again. An empty
     // directory with its empty-state message is the honest answer to an impossible question.
-    await type(user, regionInput(), 'Europe');
-    await type(user, countryInput(), 'Japan');
+    await pick(user, 'Region', 'Europe');
+    await pick(user, 'Country', 'Japan');
 
     expect(shown()).toHaveLength(0);
   });

@@ -214,32 +214,19 @@ export function CounterSlider({ groups, label, headingId }: CounterSliderProps) 
 function Figures({ group, className }: { group: CounterGroup; className?: string }) {
   return (
     /*
-      Divided by hairlines rather than by gaps, matching CounterRow so the two places this site
-      shows figures read as the same component rather than two takes on it. Floating columns in a
-      band this wide left the figures looking scattered; a rule between them gives the row a spine
-      and makes the uneven label lengths read as deliberate columns.
+      No rules between the figures. They were added on 19 Oct and taken out again the same day —
+      management found them noisy, and with the labels now reserving a fixed depth the row reads
+      as a level band without needing a line to prove it. The spacing stays.
     */
     <ul
       className={cn(
-        'grid gap-y-10 sm:grid-cols-2 sm:gap-y-12 lg:gap-y-0',
+        'grid gap-x-8 gap-y-10 sm:grid-cols-2 sm:gap-y-12 lg:gap-y-0',
         group.items.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4',
         className,
       )}
     >
       {group.items.map((item, index) => (
-        <li
-          key={item.label}
-          className={cn(
-            'flex justify-center px-4',
-            // Two up from sm, so every second cell opens a new row and takes no left rule.
-            'sm:[&:nth-child(2n+2)]:border-l sm:[&:nth-child(2n+2)]:border-hairline/20',
-            // At lg the row is whole: every cell but the first carries the rule.
-            group.items.length === 3
-              ? 'lg:[&:nth-child(3n+1)]:border-l-0'
-              : 'lg:[&:nth-child(4n+1)]:border-l-0',
-            'lg:border-l lg:border-hairline/20',
-          )}
-        >
+        <li key={item.label} className="flex justify-center">
           <Counter item={item} index={index} />
         </li>
       ))}

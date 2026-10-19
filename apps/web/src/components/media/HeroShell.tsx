@@ -67,7 +67,11 @@ export function HeroShell({
         // light-on-dark ink set.
         'ink-on-dark relative isolate flex overflow-hidden',
         compact ? 'items-end' : 'items-center',
-        compact ? 'min-h-[62svh]' : 'min-h-[92svh]',
+        /* Heights trimmed 19 Oct at management's request. 92svh left a deep empty band under
+           the headline on the About hero, and 62svh is kept for the inner pages where the hero
+           is a title block rather than a landing. Both are floors, not fixed heights, so a long
+           headline still grows its own hero rather than overflowing it. */
+        compact ? 'min-h-[58svh]' : 'min-h-[74svh]',
         className,
       )}
     >
@@ -86,8 +90,12 @@ export function HeroShell({
           ) : null}
 
           {/* The measure has to sit on the heading itself: `ch` resolves against the element's own
-              font-size, so on a wrapper it would use body size and wrap the hero far too early. */}
-          <HeroHeading roman={heading.roman} accent={heading.accent} className="max-w-[12ch]" />
+              font-size, so on a wrapper it would use body size and wrap the hero far too early.
+
+              Widened from 12ch now that HeroHeading breaks at the roman/accent seam: 12ch forced
+              a second break inside each half, which is what gave the longer headlines three and
+              four ragged lines. The longest half in the deck is 30 characters. */}
+          <HeroHeading roman={heading.roman} accent={heading.accent} className="max-w-[26ch]" />
 
           {subhead ? (
             <motion.div variants={heroLeadVariants(reduced)} initial="hidden" animate="visible">

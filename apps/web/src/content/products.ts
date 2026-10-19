@@ -189,7 +189,7 @@ const datanerve: ProductPage = {
       },
       {
         index: '02',
-        tag: 'Coming soon',
+        tag: 'Data Security Posture Management',
         title: 'DSPM',
         blurb:
           'Data security posture management: automated discovery, classification, access posture and exposure evidence across files, endpoints, databases, object storage and cloud.',

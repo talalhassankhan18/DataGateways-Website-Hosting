@@ -39,7 +39,15 @@ export function StatCallout({ figure, claim, source, dateOnly = false, className
             {source}
           </figcaption>
         </div>
-      ) : null}
+      ) : (
+        /* A date on its own says nothing — "April 2027" is only meaningful once you know what
+           happens then. The source line still stays out: a planned date has no citation. */
+        claim ? (
+          <figcaption className="text-eyebrow uppercase tracking-[0.18em] text-ink-dim lg:border-l lg:border-hairline/15 lg:pl-10">
+            {claim}
+          </figcaption>
+        ) : null
+      )}
     </Reveal>
   );
 }

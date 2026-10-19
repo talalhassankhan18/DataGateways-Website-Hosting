@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import type { PublicPartner } from '@/lib/api';
 import { fetchPublicPartners } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
@@ -11,6 +11,7 @@ import { SectionHeading } from '@/components/content/SectionHeading';
 import { PageShell } from '@/components/layout/PageShell';
 import { ImageHero } from '@/components/media/ImageHero';
 import { partnerRegions, partners } from '@/content/partners';
+import { COUNTRIES } from '@/content/countries';
 import { asset } from '@/lib/asset';
 import { Search } from 'lucide-react';
 
@@ -20,8 +21,8 @@ type Status = 'loading' | 'ready' | 'error';
 
 export default function PartnerFindPage() {
   const [query, setQuery] = useState('');
-  const [activeRegion, setActiveRegion] = useState('all');
-  const [activeCountry, setActiveCountry] = useState('all');
+  const [activeRegion, setActiveRegion] = useState('');
+  const [activeCountry, setActiveCountry] = useState('');
   const [partners, setPartners] = useState<readonly PublicPartner[]>([]);
   const [status, setStatus] = useState<Status>('loading');
 
@@ -44,29 +45,29 @@ export default function PartnerFindPage() {
   }, []);
 
   /*
-   * Only the countries that exist inside the chosen region.
+   * Every country, not only the ones a partner currently sits in.
    *
-   * Built from every partner regardless of region before, which let the two filters contradict
-   * each other: pick Europe, then Japan, and the directory is guaranteed to be empty with both
-   * controls looking perfectly reasonable. Narrowing the options means a contradiction cannot be
-   * expressed, which is better than explaining it afterwards.
+   * It used to be derived from the directory, which meant the control offered a single country
+   * and read as broken even though it was accurate. Management asked for the full list on
+   * 19 Oct. A visitor looking for their own market can now look for it and be told plainly that
+   * there is nobody there yet, which is a better answer than not being able to ask.
+   *
+   * Countries that do have a partner are floated to the top, so the common case is one keystroke
+   * away and the long tail is still reachable.
    */
   const countries = useMemo(() => {
-    const normalizedRegion = activeRegion.trim().toLowerCase();
+    const present = new Set(
+      partners
+        .map((partner) => partner.country?.trim())
+        .filter((country): country is string => Boolean(country)),
+    );
 
     return [
-      ...new Set(
-        partners
-          .filter(
-            (partner) =>
-              normalizedRegion === 'all' ||
-              partner.region.trim().toLowerCase() === normalizedRegion,
-          )
-          .map((partner) => partner.country)
-          .filter((country): country is string => Boolean(country)),
-      ),
-    ].sort();
-  }, [activeRegion, partners]);
+      ...[...present].sort((a, b) => a.localeCompare(b, 'en')),
+      ...COUNTRIES.filter((country) => !present.has(country)),
+    ];
+  }, [partners]);
+
   const listings = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const normalizedRegion = activeRegion.trim().toLowerCase();
@@ -76,14 +77,42 @@ export default function PartnerFindPage() {
         !normalizedQuery ||
         partner.company.toLowerCase().includes(normalizedQuery) ||
         partner.focusArea.toLowerCase().includes(normalizedQuery);
+      /*
+       * Substring, not equality.
+       *
+       * Both controls are typed now rather than picked, so a half-finished word has to behave
+       * sensibly: typing "ger" should narrow towards Germany, not empty the directory and leave
+       * the visitor thinking there is nobody there. An empty box means no filter.
+       */
       const matchesRegion =
-        normalizedRegion === 'all' || partner.region.trim().toLowerCase() === normalizedRegion;
+        !normalizedRegion || partner.region.trim().toLowerCase().includes(normalizedRegion);
       const matchesCountry =
-        normalizedCountry === 'all' ||
-        (partner.country?.trim().toLowerCase() ?? '') === normalizedCountry;
+        !normalizedCountry ||
+        (partner.country?.trim().toLowerCase() ?? '').includes(normalizedCountry);
       return matchesQuery && matchesRegion && matchesCountry;
     });
   }, [activeCountry, activeRegion, partners, query]);
+
+  const filterListId = useId();
+  const regionListId = `${filterListId}-regions`;
+  const countryListId = `${filterListId}-countries`;
+
+  /*
+   * One handler for both typed filters.
+   *
+   * Only a value that exactly matches a known option is reported to analytics. The controls are
+   * free text now, and sending every keystroke would put whatever somebody types into a
+   * third-party property — the same reason the partner name box has never been tracked.
+   */
+  const onFilterChange = (filterType: 'region' | 'country', value: string) => {
+    if (filterType === 'region') setActiveRegion(value);
+    else setActiveCountry(value);
+
+    const known = filterType === 'region' ? partnerRegions : countries;
+    if (value && known.some((option) => option.toLowerCase() === value.trim().toLowerCase())) {
+      trackEvent('partner_filter', { filter_type: filterType, filter_value: value.trim() });
+    }
+  };
 
   const selectClassName =
     'h-12 w-full rounded-sm border border-hairline/15 bg-bg-surface px-4 text-body-sm text-ink-primary focus:border-accent/50';
@@ -114,52 +143,48 @@ export default function PartnerFindPage() {
           />
         </span>
       </label>
+      {/*
+        Typed with a datalist rather than a <select>.
+
+        A select cannot be searched, and the country list is 249 entries long — scrolling to
+        Switzerland is not a reasonable thing to ask of anyone. A text input backed by a datalist
+        is searchable in every current browser, needs no dependency, and still exposes the whole
+        list to a keyboard and to assistive tech. Matching is by substring, so a partial entry
+        narrows rather than emptying the directory.
+      */}
       <label>
         <span className={filterLabelClassName}>Region</span>
-        <select
+        <input
+          type="text"
+          list={regionListId}
           value={activeRegion}
-          onChange={(event) => {
-            setActiveRegion(event.target.value);
-            /* The country list is about to change under it, so a country chosen for the previous
-               region would survive as an invisible filter the visitor cannot see or clear. */
-            setActiveCountry('all');
-            trackEvent('partner_filter', {
-              filter_type: 'region',
-              filter_value: event.target.value,
-            });
-          }}
+          onChange={(event) => onFilterChange('region', event.target.value)}
+          placeholder="All regions"
           aria-label="Filter partners by region"
           className={selectClassName}
-        >
-          <option value="all">All regions</option>
+        />
+        <datalist id={regionListId}>
           {partnerRegions.map((region) => (
-            <option key={region} value={region}>
-              {region}
-            </option>
+            <option key={region} value={region} />
           ))}
-        </select>
+        </datalist>
       </label>
       <label>
         <span className={filterLabelClassName}>Country</span>
-        <select
+        <input
+          type="text"
+          list={countryListId}
           value={activeCountry}
-          onChange={(event) => {
-            setActiveCountry(event.target.value);
-            trackEvent('partner_filter', {
-              filter_type: 'country',
-              filter_value: event.target.value,
-            });
-          }}
+          onChange={(event) => onFilterChange('country', event.target.value)}
+          placeholder="All countries"
           aria-label="Filter partners by country"
           className={selectClassName}
-        >
-          <option value="all">All countries</option>
+        />
+        <datalist id={countryListId}>
           {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
+            <option key={country} value={country} />
           ))}
-        </select>
+        </datalist>
       </label>
     </div>
   );
@@ -229,13 +254,21 @@ export default function PartnerFindPage() {
                   amount={0.1}
                   className="flex flex-col gap-4 rounded-sm border border-hairline/10 bg-bg-surface/50 p-6 transition-[border-color,box-shadow] duration-hover hover:border-accent/40 hover:shadow-card-hover"
                 >
+                  {/*
+                    No tier badge. Management asked for Bronze off the cards on 19 Oct, and a
+                    badge that only ever reads Bronze ranks your own partners in public for no
+                    benefit to anyone. The region moves to the left, where the badge used to sit,
+                    so the row still opens on something rather than on empty space.
+                  */}
                   <div className="flex items-center justify-between gap-4">
-                    <span className="rounded-sm border border-accent/30 px-2.5 py-1 text-eyebrow uppercase tracking-[0.14em] text-accent-ink">
-                      {listing.tier}
-                    </span>
-                    <span className="text-eyebrow uppercase tracking-[0.14em] text-ink-dim">
+                    <span className="text-eyebrow uppercase tracking-[0.14em] text-accent-ink">
                       {listing.region}
                     </span>
+                    {listing.country ? (
+                      <span className="text-eyebrow uppercase tracking-[0.14em] text-ink-dim">
+                        {listing.country}
+                      </span>
+                    ) : null}
                   </div>
 
                   <div className="flex h-12 items-center">
@@ -251,10 +284,13 @@ export default function PartnerFindPage() {
                   <h3 className="min-h-[2.4rem] text-h3 font-bold uppercase text-ink-primary">
                     {listing.company}
                   </h3>
-                  <p className="text-body-sm text-ink-secondary">
-                    {listing.focusArea}
-                    {listing.country ? ` · ${listing.country}` : ''}
-                  </p>
+
+                  {/* "General" is the placeholder the backend sends when no focus area has been
+                      set, so printing it tells the reader nothing and makes every card look
+                      identical. Shown only when it says something. */}
+                  {listing.focusArea && listing.focusArea.trim().toLowerCase() !== 'general' ? (
+                    <p className="text-body-sm text-ink-secondary">{listing.focusArea}</p>
+                  ) : null}
                 </Reveal>
               ))}
             </ul>

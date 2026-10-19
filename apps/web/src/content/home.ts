@@ -89,13 +89,12 @@ export const home = {
         index: '01',
         shortTitle: 'Data Governance',
         heading: { roman: 'Convert frameworks into', accent: 'data Intelligence' } satisfies Heading,
-        /* Trimmed to its first sentence, 12 Oct. The second enumerated ownership, quality,
-           classification, lineage, security and compliance, which took this blurb to 243
-           characters against roughly 110 for the other four — so its cell opened half again as
-           deep as theirs and was the only one the hero card had to truncate. The full sentence
-           still lives on the governance page this card links to. */
+        /* Management's wording, supplied 19 Oct. Replaces the sentence trimmed here on 12 Oct —
+           that trim was made to level the card heights and is the reversion the 19 Oct email is
+           about, so the copy is authoritative now and the layout accommodates it rather than the
+           other way round. */
         blurb:
-          'Transform Data Governance from frameworks and policies into practical, intelligent control.',
+          'DataNerve operationalizes data governance frameworks by translating organizational data into measurable governance, quality, classification, security and compliance controls.',
         href: '/products/datanerve/governance',
       },
       {
@@ -193,11 +192,13 @@ export const home = {
         id: 'datanerve',
         label: 'DataNerve',
         heading: { roman: 'Every identifier,', accent: 'every jurisdiction' } satisfies Heading,
+        /* Order fixed by management, 19 Oct: detectors, regions, countries, interpreters. That
+           also satisfies the separate instruction to list Regions before Countries. */
         items: [
-          { value: flag.verified('24000+'), label: 'Predefined Interpreters' },
-          { value: flag.verified('250'), label: 'Countries & Territories' },
           { value: flag.verified('90+'), label: 'Data Quality Detectors' },
           { value: flag.verified('9+'), label: 'Regions Covered' },
+          { value: flag.verified('250'), label: 'Countries & Territories' },
+          { value: flag.verified('24,000+'), label: 'Predefined Interpreters' },
         ],
       },
       {

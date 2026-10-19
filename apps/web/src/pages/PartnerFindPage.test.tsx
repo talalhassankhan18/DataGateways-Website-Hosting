@@ -37,7 +37,18 @@ const DIRECTORY: readonly PublicPartner[] = [
 
 const shown = () => screen.queryAllByRole('heading', { level: 3 }).map((h) => h.textContent);
 
-const regionSelect = () => screen.getByLabelText('Filter partners by region');
+const regionInput = () => screen.getByLabelText('Filter partners by region');
+const countryInput = () => screen.getByLabelText('Filter partners by country');
+
+/** The controls are typed now, so clearing means emptying the box rather than picking "all". */
+const type = async (
+  user: ReturnType<typeof userEvent.setup>,
+  field: HTMLElement,
+  value: string,
+) => {
+  await user.clear(field);
+  if (value) await user.type(field, value);
+};
 
 describe('the partner directory', () => {
   beforeEach(() => {
@@ -75,18 +86,40 @@ describe('the partner directory', () => {
   it('narrows to the chosen region', async () => {
     const user = await renderDirectory();
 
-    await user.selectOptions(regionSelect(), 'Europe');
+    await type(user, regionInput(), 'Europe');
 
     expect(shown()).toEqual(['Alpha Europe', 'Beta Europe']);
+  });
+
+  it('narrows on a partial entry rather than emptying the directory', async () => {
+    const user = await renderDirectory();
+
+    // The controls are typed, so a half-finished word has to behave sensibly on the way in.
+    await type(user, countryInput(), 'ger');
+
+    expect(shown()).toEqual(['Alpha Europe']);
+  });
+
+  it('offers every country, not only the ones a partner sits in', async () => {
+    await renderDirectory();
+
+    const options = Array.from(
+      document.querySelectorAll<HTMLOptionElement>('datalist option'),
+    ).map((option) => option.value);
+
+    // Management asked for the full list on 19 Oct. Countries with a partner come first.
+    expect(options).toContain('Germany');
+    expect(options).toContain('Switzerland');
+    expect(options.length).toBeGreaterThan(200);
   });
 
   it('restores every partner when the region goes back to all', async () => {
     const user = await renderDirectory();
 
-    await user.selectOptions(regionSelect(), 'Europe');
+    await type(user, regionInput(), 'Europe');
     expect(shown()).toHaveLength(2);
 
-    await user.selectOptions(regionSelect(), 'all');
+    await type(user, regionInput(), '');
 
     /*
      * The reported bug. The filter arithmetic was never wrong — the partners came straight back
@@ -111,12 +144,10 @@ describe('the partner directory', () => {
 
   it('restores every partner when the country goes back to all', async () => {
     const user = await renderDirectory();
-    const countrySelect = screen.getByLabelText('Filter partners by country');
-
-    await user.selectOptions(countrySelect, 'Japan');
+    await type(user, countryInput(), 'Japan');
     expect(shown()).toEqual(['Gamma Asia']);
 
-    await user.selectOptions(countrySelect, 'all');
+    await type(user, countryInput(), '');
 
     expect(shown()).toHaveLength(DIRECTORY.length);
   });
@@ -124,38 +155,20 @@ describe('the partner directory', () => {
   it('combines region and country while both are set', async () => {
     const user = await renderDirectory();
 
-    await user.selectOptions(regionSelect(), 'Asia');
-    await user.selectOptions(screen.getByLabelText('Filter partners by country'), 'Japan');
+    await type(user, regionInput(), 'Asia');
+    await type(user, countryInput(), 'Japan');
 
     expect(shown()).toEqual(['Gamma Asia']);
   });
 
-  it('clears the country when the region changes, so no invisible filter survives', async () => {
+  it('shows nothing when the two filters cannot both be true', async () => {
     const user = await renderDirectory();
 
-    await user.selectOptions(regionSelect(), 'Asia');
-    await user.selectOptions(screen.getByLabelText('Filter partners by country'), 'Japan');
-    expect(shown()).toEqual(['Gamma Asia']);
+    // Now that every country is offered, Europe plus Japan is expressible again. An empty
+    // directory with its empty-state message is the honest answer to an impossible question.
+    await type(user, regionInput(), 'Europe');
+    await type(user, countryInput(), 'Japan');
 
-    await user.selectOptions(regionSelect(), 'all');
-
-    // The country list is rebuilt for the new region, so a country left over from the previous
-    // one would narrow the results with nothing on screen explaining why.
-    expect(shown()).toHaveLength(DIRECTORY.length);
-    expect(screen.getByLabelText('Filter partners by country')).toHaveValue('all');
-  });
-
-  it('offers only the countries that exist in the chosen region', async () => {
-    const user = await renderDirectory();
-
-    await user.selectOptions(regionSelect(), 'Europe');
-
-    const options = Array.from(
-      screen.getByLabelText<HTMLSelectElement>('Filter partners by country').options,
-    ).map((option) => option.value);
-
-    // Europe plus Japan would be an empty result that both controls make look reasonable. The
-    // contradiction is removed rather than explained.
-    expect(options).toEqual(['all', 'France', 'Germany']);
+    expect(shown()).toHaveLength(0);
   });
 });

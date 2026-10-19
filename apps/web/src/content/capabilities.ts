@@ -348,7 +348,10 @@ const governance: CapabilityPage = {
 
   maturity: {
     id: 'maturity',
-    eyebrow: 'Data Governance',
+    /* Was "Data Governance", the same eyebrow the management band two sections earlier already
+       uses, so the page appeared to restate itself. The eyebrow names the subject of its own
+       section. */
+    eyebrow: 'Assessment and roadmap',
     heading: { roman: 'Governance', accent: 'Maturity' },
     cards: [
       {
@@ -374,7 +377,7 @@ const governance: CapabilityPage = {
 
   grid: {
     id: 'reporting',
-    heading: { roman: 'Four report depths,', accent: 'one source of truth' },
+    heading: { roman: 'Reporting', accent: '' },
     intro:
       'Human review stays in control. AI-assisted generation is grounded in the project’s own data, including maturity evidence, risks, controls and roadmap actions, rather than in a model’s general knowledge of governance.',
     cards: [
@@ -416,7 +419,9 @@ const governance: CapabilityPage = {
 const dspm: CapabilityPage = {
   slug: 'dspm',
   name: 'DSPM',
-  status: 'Coming soon',
+  /* No longer "Coming soon" — removed 19 Oct at management's instruction. DSPM is presented as a
+     shipping capability, so it carries the same status as governance. */
+  status: 'Available now',
 
   seo: {
     title: 'DSPM | Data Security Posture Management by DataGateways',
@@ -702,9 +707,10 @@ const dlp: CapabilityPage = {
     text: '',
   },
 
+  /* Availability date supplied by management, 19 Oct. */
   callout: {
-    figure: 'Coming soon',
-    claim: '',
+    figure: 'April 2027',
+    claim: 'Planned availability for Data Loss Prevention.',
     source: '',
   },
 

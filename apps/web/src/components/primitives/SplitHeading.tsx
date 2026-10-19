@@ -79,7 +79,12 @@ export function SplitHeading({
         className,
       )}
     >
-      <span className="text-ink-primary">{roman}</span>{' '}
+      {/* The separating space is only emitted when there are two halves to separate. A heading
+          that is a single phrase — "Reporting" — otherwise rendered with a trailing space and an
+          empty span after it, which showed up as a stray gap and as "Reporting " in the
+          accessible name. */}
+      <span className="text-ink-primary">{roman}</span>
+      {roman && accent ? ' ' : null}
       <span className={ACCENT_CLASS[resolved]}>{accent}</span>
     </Tag>
   );

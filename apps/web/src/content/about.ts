@@ -41,7 +41,11 @@ export const about = {
   /** The founding story, in concise paragraphs with the original milestones intact. */
   story: {
     id: 'story',
-    heading: { roman: 'About us', accent: '' } satisfies Heading,
+    eyebrow: 'Who we are',
+    /* Split across the two inks like every other heading on the site. It was set entirely in the
+       primary ink, which is the inconsistency the 19 Oct email is about — the words are the
+       client's own either way. */
+    heading: { roman: 'About', accent: 'us' } satisfies Heading,
     paragraphs: [
       flag.verified(
         'DataGateways was founded by practitioners in Cyber Security, Data and Artificial Intelligence. Their work exposed gaps in existing approaches to real-world technology challenges.',

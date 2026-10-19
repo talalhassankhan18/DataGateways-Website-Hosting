@@ -14,6 +14,7 @@ import { StepCard } from '@/components/content/StepCard';
 import { PageShell } from '@/components/layout/PageShell';
 import { ImageHero } from '@/components/media/ImageHero';
 import { capabilities, isCapabilitySlug } from '@/content/capabilities';
+import { site } from '@/content/site';
 import { cn } from '@/lib/cn';
 import NotFoundPage from './NotFoundPage';
 
@@ -156,12 +157,33 @@ export default function CapabilityPage() {
               ))}
             </DividedGrid>
 
-            <div className="mt-8 rounded-md bg-transparent px-8 py-7 text-ink-primary lg:flex lg:items-start lg:gap-12">
-              <p className="shrink-0 text-h4 font-bold uppercase leading-[1.15]">
-                Program Outcome
-              </p>
-              <p className="mt-3 max-w-3xl text-body lg:mt-0">{page.management.outcome}</p>
-            </div>
+            {/*
+              The outcome panel.
+
+              It used to be a transparent box carrying eight units of padding, so it sat indented
+              from the card grid above it with nothing to justify the inset — the label and the
+              sentence floated at different left edges and the whole thing read as unfinished.
+              It now has an actual surface and shares the accent rule the DSPM executive point
+              and the compliance notes use, so the three read as one device.
+
+              The label is an eyebrow rather than an h4: it names the panel, it is not a step in
+              the document outline, and an h4 between the card headings and the next section's h2
+              put a rung in the heading ladder that leads nowhere.
+            */}
+            <Reveal>
+              <div className="mt-10 rounded-md border border-hairline/15 bg-bg-surface/60 p-7 lg:p-9">
+                <span
+                  aria-hidden="true"
+                  className="block h-0.5 w-10 bg-accent-solid"
+                />
+                <p className="mt-5 text-eyebrow font-semibold uppercase tracking-[0.18em] text-accent-ink">
+                  {site.ui.programOutcome}
+                </p>
+                <p className="mt-3 max-w-measure text-body text-ink-primary">
+                  {page.management.outcome}
+                </p>
+              </div>
+            </Reveal>
           </Container>
         </Section>
       ) : null}
@@ -169,7 +191,12 @@ export default function CapabilityPage() {
       {page.dataQuality ? (
         <Section
           id={page.dataQuality.id}
-          tone="light"
+          /* Grey. It sits between the management band (light) and the flow band (white), so it
+             is the one tone that collides with neither — two adjacent bands sharing a tone merge
+             into one long stretch with nothing marking where one subject ends and the next
+             begins, which is the clearest part of the 19 Oct note about this page looking
+             inconsistent. */
+          tone="grey"
           labelledBy="capability-quality-heading"
           className="-mt-16 lg:-mt-24"
         >
@@ -301,7 +328,12 @@ export default function CapabilityPage() {
       ) : null}
 
       {page.riskPosture ? (
-        <Section id={page.riskPosture.id} tone="grey" labelledBy="capability-risk-posture-heading">
+        <Section
+          id={page.riskPosture.id}
+          /* Light, not grey: the modules band immediately above it is grey. */
+          tone="light"
+          labelledBy="capability-risk-posture-heading"
+        >
           <Container>
             <SectionHeading
               id="capability-risk-posture-heading"

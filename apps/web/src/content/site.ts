@@ -240,6 +240,8 @@ export const site = {
     counterResume: 'Resume the changing figures',
     productSwitcherLandmark: 'Choose a product',
     learnMore: 'Learn more',
+    /* Labels the outcome panel under the management grid on a capability page. */
+    programOutcome: 'Program outcome',
   },
 } as const;
 

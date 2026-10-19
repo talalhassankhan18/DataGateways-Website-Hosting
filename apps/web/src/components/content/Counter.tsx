@@ -92,7 +92,19 @@ export function Counter({ item, index = 0, className }: CounterProps) {
         </p>
       </PlaceholderBadge>
 
-      <p aria-hidden="true" className="mt-4 text-body-sm font-light text-ink-secondary">
+      {/*
+        Two lines reserved for the label.
+
+        "Data Quality Detectors" wraps to two lines in a quarter-width column while "Regions
+        Covered" fits on one, so without a reservation the figures in a row sit over labels of
+        different depths and the band ends on a ragged edge. It also stops the counter slider
+        changing height as it rotates between a group whose labels wrap and one whose labels do
+        not, which read as the whole band twitching.
+      */}
+      <p
+        aria-hidden="true"
+        className="mt-4 flex min-h-[2.8em] max-w-[18ch] items-start justify-center text-balance text-body-sm font-light leading-[1.4] text-ink-secondary"
+      >
         {item.label}
       </p>
     </div>

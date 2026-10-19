@@ -2,6 +2,16 @@ name: Deploy to GitHub Pages
 
 # Pushing to main is the deploy. There is no `npm run deploy` — the build that ships is the one
 # this workflow produces, so a deploy cannot pick up uncommitted local state.
+#
+# This must stay the ONLY workflow that publishes to Pages. A repository has one Pages site, so a
+# second publishing workflow does not merge with this one — it replaces it, and whichever job
+# happens to deploy last is the site. A `Build and Deploy` workflow added on 17 Oct ran
+# `jekyll-build-pages` over the repo root and published that; both workflows went green on every
+# push, and the live site was whichever won the race. For a day it was the README rendered by the
+# Jekyll primer theme. Sharing `concurrency: group: pages` did not prevent it — that queues jobs,
+# it does not stop a second one overwriting the first.
+#
+# If something else needs to reach the deployed HTML, add a step here. Do not add a workflow.
 on:
   push:
     branches: [main]

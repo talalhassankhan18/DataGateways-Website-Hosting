@@ -10,6 +10,47 @@ rather than re-done from memory.
 
 ---
 
+## Round 9 — 19 October 2026 (the deployed site was the README)
+
+**Symptom.** "Build and Deploy" was green but the site would not load.
+
+**Cause.** The repository had *two* workflows publishing to GitHub Pages.
+
+| Workflow | What it published | Added |
+| --- | --- | --- |
+| `deploy-pages.yml` — "Deploy to GitHub Pages" | `npm ci` → `npm run build:pages` → `apps/web/dist` — the real app | 12 Oct |
+| `main.yml` — "Build and Deploy" | `jekyll-build-pages` over the repo root → `_site` | 17 Oct, commit `a67842a` |
+
+`main.yml` never built the React app: no `npm ci`, no `npm run build`, no reference to
+`apps/web/dist`. It ran Jekyll over the repo root, where the only page is `README.md`, so the
+artifact it published was the README rendered with the `jekyll-theme-primer` theme. It went green
+because Jekyll succeeded — a green check on that workflow never meant the site had been built.
+
+A repository has one Pages site, so the second workflow did not merge with the first, it replaced
+it. Both ran on every push and the live site was whichever deployed last. Sharing
+`concurrency: group: pages` did not help — that queues jobs, it does not stop one overwriting the
+other, and it cancelled "Deploy to GitHub Pages" #15 outright. Confirmed by loading
+`talalhassankhan18.github.io/DataGateways-Website-Hosting/`, which served the README.
+
+**Fix.** Removed `main.yml`, `_config.yml` and `_includes/head-custom.html` — the three files
+commit `a67842a` added, which existed only to serve each other. `deploy-pages.yml` is unchanged
+and already verified working: run #18 built and deployed commit `208241a` successfully in 55s. A
+note now states in the workflow that it must remain the only publisher.
+
+**Two things this exposed, for the record.**
+
+- **The README was public.** Including its `[!IMPORTANT]` note that the site is not ready to go
+  public and that several claims, every compliance mark and the whole partner directory are
+  drafted rather than confirmed. That text was served at the Pages URL for about two days.
+- **`main.yml` injected two repository secrets into the HTML.** `A89632` and `BB245F` replaced
+  two placeholder comments in `_includes/head-custom.html`. That only ever reached the Jekyll
+  pages, never the React app, so whatever those snippets were for was not being achieved on the
+  real site. Removed with the rest. **If they are needed — a search-console verification tag, an
+  analytics snippet — say so and they can be injected into the real build instead.** They are
+  recoverable from commit `a67842a`.
+
+---
+
 ## Round 8 — 19 October 2026 (Program Outcome panel overlap)
 
 | # | Request | Done | Where |

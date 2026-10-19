@@ -39,14 +39,28 @@ export function Header() {
           hidden && !openPanel && '-translate-y-full',
         )}
       >
-        <Container className="flex h-[var(--header-height)] items-center justify-between gap-6">
+        {/*
+          The `max-[359px]` tightening is a fit, not a style. At 320px the row has 280px of
+          content box and wants 317: the logo is `shrink-0` at 203px (32px mark + 12px gap +
+          159px wordmark, whose 0.2em tracking alone is 36px of it), plus this 24px gap, plus a
+          90px Menu button. The button lost that argument and sat 17px off the right edge, which
+          put the only navigation a phone has partly out of reach.
+
+          Tightening the gap, the tracking and the button's padding gives back ~50px, which clears
+          it with room. The bound is 359px rather than `max-sm` because `sm` is 480px here and the
+          header already fits from about 357px up - a 375px or 414px phone is correct as it is and
+          must not be restyled to fix a 320px one.
+        */}
+        <Container className="flex h-[var(--header-height)] items-center justify-between gap-6 max-[359px]:gap-2">
           <Link
             to="/"
             aria-label={site.ui.homeLink}
             className="tap-target flex shrink-0 items-center gap-3 text-ink-primary"
           >
             <img src={asset(site.logo.src)} alt={site.logo.alt} className="h-8 w-8" width={32} height={32} />
-            <span className="text-body-sm font-semibold tracking-[0.2em]">{site.wordmark}</span>
+            <span className="text-body-sm font-semibold tracking-[0.2em] max-[359px]:tracking-[0.08em]">
+              {site.wordmark}
+            </span>
           </Link>
 
           <nav aria-label={site.ui.primaryNavLandmark} className="hidden lg:block">
@@ -93,7 +107,7 @@ export function Header() {
               onClick={() => setMenuOpen(true)}
               aria-expanded={menuOpen}
               aria-controls={menuId}
-              className="flex items-center gap-2 rounded-md border border-hairline/15 px-4 py-3 text-body-sm text-ink-primary transition-colors duration-hover hover:border-accent/50 hover:bg-bg-elevated lg:hidden"
+              className="flex items-center gap-2 rounded-md border border-hairline/15 px-4 py-3 text-body-sm text-ink-primary transition-colors duration-hover hover:border-accent/50 hover:bg-bg-elevated max-[359px]:px-2.5 lg:hidden"
             >
               {site.ui.menuOpen}
               <span aria-hidden="true" className="text-accent-ink">

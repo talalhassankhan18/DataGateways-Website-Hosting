@@ -171,8 +171,23 @@
     position: absolute;
     left: 0;
     right: 0;
-    /* Centred in the space above the cards, not in the section, so the two do not collide. */
-    top: calc(50svh + 6.5rem - (var(--cards-peek) / 2));
+    /*
+     * Centred in the space above the cards, not in the section, so the two do not collide - with
+     * a ceiling, because below lg centring alone was not enough.
+     *
+     * Below lg the cards are not on the hero floor; they start in the flow at the section's
+     * `pt-[68svh]`. The headline knew nothing about that: `--cards-peek` is 0 here, so it centred
+     * at `50svh + 6.5rem` no matter how short the window was, and the two values converge as the
+     * viewport loses height. They met at about 1067px tall and crossed below it - at 320x568 the
+     * headline sat 44px INTO the first card, printing itself over "01 Data governance".
+     *
+     * The second term is the ceiling: 68svh is where the cards begin, less 1rem of air and 4.5rem
+     * for the tallest half-headline below lg (three lines at the 3rem cap). `min()` takes it only
+     * when it is the smaller, so on anything tall enough to have been correct the first term still
+     * wins and the position is unchanged. lg restores the original formula below, since there the
+     * peek term is doing this job already.
+     */
+    top: min(calc(50svh + 6.5rem), calc(68svh - 1rem - 4.5rem));
     transform: translateY(-50%);
     z-index: 3;
     padding-inline: 2vw;
@@ -193,6 +208,12 @@
   }
 
   @media (min-width: 1024px) {
+    /* The cards are on the hero floor here, and `--cards-peek` already reserves them, so the
+       mobile ceiling above would only fight a collision that cannot happen. */
+    .hero-giant {
+      top: calc(50svh + 6.5rem - (var(--cards-peek) / 2));
+    }
+
     /*
      * One line, sized so it fits whatever it says.
      *
@@ -349,6 +370,14 @@
       line-clamp: 6;
       overflow: hidden;
       min-height: 9.3rem; /* 6 x 24.75px line height */
+      /* The clamp above is vertical and deliberate. This is horizontal and is not: the card is
+         160px wide at the lg breakpoint, and the DSPM blurb opens on "Discovery,classififcation,
+         access" - no spaces after the commas, so the browser treats it as one 225px word. With
+         the default `overflow-wrap: normal` it cannot break, so `overflow: hidden` cut 65px of it
+         off mid-word. Breaking is the lesser evil, and it changes nothing for text that already
+         fits. The missing spaces are the client's copy, applied verbatim and logged in
+         project.md; this keeps that copy readable without editing it. */
+      overflow-wrap: break-word;
     }
 
     .hero-card__title,

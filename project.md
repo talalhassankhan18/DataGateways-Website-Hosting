@@ -10,6 +10,64 @@ rather than re-done from memory.
 
 ---
 
+## Round 7 — 19 October 2026 (responsiveness audit)
+
+A sweep of all 16 routes at nine viewports from 320x568 to 2560x1440, checking for horizontal page
+scroll, elements past the viewport edge, and text clipped inside its own box.
+
+**Result: no page anywhere has a horizontal scrollbar, at any of the nine widths.** Four real
+defects were found and fixed; everything else the sweep flagged was intentional and is listed
+below so the next audit does not re-raise it.
+
+| # | Defect | Where | Fix |
+| --- | --- | --- | --- |
+| 7.1 | Header "Menu" button sat 17px off the right edge at <=356px, on every route — the only navigation a phone has, partly out of reach | `layout/Header.tsx` | Tighten gap, wordmark tracking and button padding below 360px |
+| 7.2 | Footer logo lockup overflowed the viewport by 3px at 320px and ignored the gutter entirely | `layout/Footer.tsx` | Drop the wordmark to `text-xl`/`0.06em` below 360px |
+| 7.3 | Hero headline overlapped the first hero card by 44px at 320x568 — it printed over "01 Data governance" | `styles/index.css` | Ceiling the headline's centre so it cannot cross where the cards start |
+| 7.4 | DSPM hero-card blurb had 65px of text cut off mid-word at 1024px | `styles/index.css` | `overflow-wrap: break-word` on `.hero-card__blurb` |
+
+**7.1 — the header, in numbers.** At 320px the row has 280px of content box and wanted 317: the
+logo is `shrink-0` at 203px (32px mark + 12px gap + a 159px wordmark, 36px of which is its 0.2em
+tracking), plus a 24px gap, plus a 90px button. The button lost and was pushed off-screen.
+Tightening the three gives back about 50px. The bound is `max-[359px]` rather than `max-sm`
+because `sm` is 480px in this config and the header already fits from about 357px up — a 375px or
+414px phone is correct as it is and must not be restyled to fix a 320px one. Verified: at 360px
+and 375px the logo is still 203px and the button still 90px, unchanged.
+
+**7.3 — the headline, and why it was not obvious.** Below `lg` the cards are not on the hero
+floor; they start in the normal flow at the section's `pt-[68svh]`. The headline knew nothing
+about that — `--cards-peek` is `0` below `lg`, so it centred at `50svh + 6.5rem` however short the
+window was. The two values converge as the viewport loses height, meet at about 1067px tall and
+cross below it. The fix is a `min()` ceiling at `68svh - 1rem - 4.5rem`, taken only when it is the
+smaller, so every viewport that was already correct is untouched. Confirmed at 1440x900 the
+computed `top` is 478px, identical to the old formula; `lg` keeps the original rule outright.
+
+**7.4 — a clipping caused by the copy, fixed without touching the copy.** The card is 160px wide
+at `lg` and the blurb opens on "Discovery,classififcation,access" — no spaces after the commas, so
+the browser sees one 225px word, cannot break it, and `overflow: hidden` cut 65px off mid-word.
+Allowing the break keeps the client's wording verbatim and changes nothing for text that fits.
+The missing spaces remain a copy question, logged under known issues.
+
+**Flagged by the sweep, intentional, not defects:**
+
+| Pattern | Why it is correct |
+| --- | --- |
+| `section#hero` reports a 3–52px horizontal cut on every hero | The background image is a `scale(1.12)` Ken Burns layer, centred and clipped by the section on purpose |
+| AINerve module `li` reports a 32px cut | A `pointer-events-none` hover accent at `-right-8`, clipped by design |
+| DSPM compliance table overflows its row | It is inside `overflow-x-auto` — the standard responsive-table treatment |
+| Footer reports a 6px cut | The decorative wordmark marquee |
+| `sr-only` headings and captions report large cuts | Visually hidden by definition — the counters `h2` is `sr-only` and reports 519px |
+| `/contact` reports a 9979px overflow | The spam honeypot at `left: -9999px` |
+
+**A measurement trap worth recording.** The counter panel appeared pinned 32px to the right with
+its entrance never running. It was not: the browser pane was hidden, so `requestAnimationFrame`
+was paused and every framer-motion entrance froze at its initial value. With the pane shown, rAF
+runs at ~61fps and the panel settles to `transform: none`. **Animation state measured in a hidden
+pane is not evidence.** The `overflow-x-clip` guard `CounterSlider` documents is what kept that
+frozen state from becoming a page-wide scrollbar.
+
+---
+
 ## Round 6 — 19 October 2026 (hero welcome line)
 
 | # | Request | Done | Where |
@@ -314,3 +372,5 @@ rule during this round and moved out.
   Partner
 - Round 6 additionally measured the hero at ten viewports from 1920×1080 down to 320×568 — see the
   table in that entry
+- Round 7 swept all 16 routes at nine viewports from 320×568 to 2560×1440: no horizontal page
+  scroll anywhere, and the four defects it found are fixed and re-verified

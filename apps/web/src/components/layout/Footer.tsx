@@ -73,7 +73,12 @@ export function Footer() {
             width={80}
             height={80}
           />
-          <span className="text-2xl font-semibold tracking-[0.16em] text-ink-primary sm:text-3xl">
+          {/* Same 320px fit as the header, same reasoning. The lockup is a 64px mark, a 16px gap
+              and a 243px wordmark - 323px against the 280px a 320px screen leaves inside the
+              gutter - so the last letter was clipped by the footer's own overflow. Dropping the
+              size and most of the tracking below 360px brings it to about 259px. The mark keeps
+              its size, and 360px up is untouched. */}
+          <span className="text-2xl font-semibold tracking-[0.16em] text-ink-primary max-[359px]:text-xl max-[359px]:tracking-[0.06em] sm:text-3xl">
             {site.wordmark}
           </span>
         </Link>

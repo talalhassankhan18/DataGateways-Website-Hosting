@@ -78,20 +78,45 @@ export function HeroSlider({ id, slides, welcome, lead, media, scrollCueTarget }
 
       {/* The standing welcome line sits above the rotating headline so the page always says who
           this is, whichever area is showing. */}
-      <Container className="pointer-events-none absolute inset-x-0 top-[calc(var(--header-height)+4rem)] z-[3]">
+      <Container className="pointer-events-none absolute inset-x-0 top-[calc(var(--header-height)+1rem)] z-[3] lg:top-[calc(var(--header-height)+1.5rem)]">
         <motion.div
           variants={heroLeadVariants(reduced)}
           initial="hidden"
           animate="visible"
           className="hero-ink text-center"
         >
+          {/*
+            Both lines are held to one line each, and sized off whichever viewport dimension is
+            the tighter constraint.
+
+            This block is positioned absolutely at the top of the hero while the headline is
+            centred in it, so the two converge as the window gets shorter — sizing on width
+            alone, the pair cleared the headline by 149px at 1440x900 but by 15px at 1366x620,
+            which is not clearance, it is luck. `min(vw, svh)` makes the type answer to the
+            dimension that is actually running out, so the gap holds on a short laptop.
+
+            Neither line may wrap: "WELCOME TO DATAGATEWAYS" broken in two reads as a mistake,
+            and the lead under it was asked for on a single line. That turns the lead's 66
+            characters into the binding constraint — one line of it is approximately 29x its own
+            font size, so the vw term is what keeps it inside the container, and the ceiling is
+            what stops it spanning the full width on a wide monitor.
+
+            Below `md` the lead wraps again, because 66 characters on a 375px phone would mean
+            roughly 12px type. A line nobody can read is not a line kept.
+
+            The kicker's 1.125rem floor is not a style choice and should not be raised. On a
+            phone the vw term has collapsed and the floor is what renders, and at 1.25rem the
+            unbreakable line measured 305px against the 280px a 320px screen has to give it —
+            the overflow does not scroll, it is clipped by the hero, so the word is simply cut
+            in half. At 1.125rem it fits. The ceiling is where the growth went instead.
+          */}
           <Eyebrow
-            className="justify-center whitespace-nowrap font-display !text-[clamp(1.3rem,2.4vw,2.1rem)] font-bold"
+            className="justify-center whitespace-nowrap font-display !text-[clamp(1.125rem,min(2.9vw,4.6svh),2.75rem)] font-bold tracking-[0.06em] text-accent-teal"
             showRule={false}
           >
             {welcome}
           </Eyebrow>
-          <p className="mx-auto mt-12 max-w-measure font-display text-[clamp(1.25rem,2vw,1.75rem)] font-bold text-ink-secondary">
+          <p className="mx-auto mt-3 max-w-[46ch] font-display text-[clamp(1.0625rem,min(2.2vw,3.5svh),2.125rem)] font-medium leading-[1.35] text-ink-secondary sm:mt-4 md:max-w-none md:whitespace-nowrap">
             {lead}
           </p>
         </motion.div>

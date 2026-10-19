@@ -10,6 +10,57 @@ rather than re-done from memory.
 
 ---
 
+## Round 6 — 19 October 2026 (hero welcome line)
+
+| # | Request | Done | Where |
+| --- | --- | --- | --- |
+| 6.1 | Hero kicker and lead are too small — make them bigger | ✅ | `components/media/HeroSlider.tsx` |
+| 6.2 | "Your trusted partner in Data Security and Artificial Intelligence." on one line | ✅ | `components/media/HeroSlider.tsx` |
+
+**What changed.**
+
+| | Before | After |
+| --- | --- | --- |
+| Kicker | `clamp(1rem, 1.8vw, 1.4rem)` | `clamp(1.125rem, min(2.9vw, 4.6svh), 2.75rem)` |
+| Lead | `text-body-sm sm:text-base lg:text-lead` | `clamp(1.0625rem, min(2.2vw, 3.5svh), 2.125rem)` |
+| Lead wrapping | `max-w-measure`, always wrapped | `md:max-w-none md:whitespace-nowrap` |
+| Gap between them | `mt-2` | `mt-3 sm:mt-4` |
+
+At 1440x900 that takes the kicker from 22.4px to 41.4px and the lead from 21px to 31.5px.
+
+**Why the clamps use `min(vw, svh)`.** This block is positioned absolutely at the top of the hero
+while the rotating headline is centred in it, so the two converge as the window gets shorter —
+height is the dimension that runs out first, not width. Sized on width alone the enlarged pair
+cleared the headline by 149px at 1440x900 but by 15px at 1366x620, which is not clearance, it is
+luck. The clamp answers to whichever dimension is tighter, so the gap holds on a short laptop.
+
+**Why the lead wraps again below `md`.** One line of it is about 29x its own font size, so 66
+characters on a 375px phone would mean roughly 12px type. The single line is kept from 768px up,
+where it fits with room to spare, and allowed to wrap below that.
+
+**Do not raise the kicker's 1.125rem floor.** On a phone the vw term has collapsed and the floor
+is what actually renders. At 1.25rem the unbreakable line measures 305px against the 280px a
+320px screen has to give it, and the overflow does not scroll — the hero clips it, so the word is
+cut in half. This was tried in this round and reverted. The growth went into the ceiling instead,
+which is where it is visible anyway.
+
+**Measured after the change — nine viewports, no overlap and no horizontal scroll at any:**
+
+| Viewport | Kicker | Lead | Lead lines | Slack on the line | Gap to headline |
+| --- | --- | --- | --- | --- | --- |
+| 1920x1080 | 44px | 34px | 1 | — | 229px |
+| 1440x900 | 41.4px | 31.5px | 1 | 303px | 162px |
+| 1440x700 | 32.2px | 24.5px | 1 | — | 87px |
+| 1366x620 | 28.5px | 21.7px | 1 | 528px | 72px |
+| 1280x800 | — | 28px | 1 | 250px | — |
+| 1024x768 | — | 22.5px | 1 | 161px | — |
+| 768x1024 | 17px | 17px | 1 | 194px | — |
+| 767x1024 | 17px | 17px | 2 (by design) | — | — |
+| 375x812 | 18px | 17px | 2 (by design) | 30px | 282px |
+| 320x568 | 18px | 17px | 3 (by design) | 6px | 123px |
+
+---
+
 ## Round 5 — 19 October 2026 (follow-up)
 
 | # | Request | Done | Where |
@@ -261,3 +312,5 @@ rule during this round and moved out.
 - **Production build clean**
 - Checked in a browser at 1440×900 on Home, Data Governance, DSPM, DLP, SOCMINT, About and Find a
   Partner
+- Round 6 additionally measured the hero at ten viewports from 1920×1080 down to 320×568 — see the
+  table in that entry

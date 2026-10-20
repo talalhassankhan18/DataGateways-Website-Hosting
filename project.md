@@ -10,6 +10,44 @@ rather than re-done from memory.
 
 ---
 
+## Round 10 — 20 October 2026 (AINerve corrections)
+
+| # | Request | Done | Where |
+| --- | --- | --- | --- |
+| 10.1 | DLP is "Data Loss Prevention", not leakage | ✅ | `content/products.ts` |
+| 10.2 | Lead is one line: "Intelligence is easy to buy, Control is not!" | ✅ | `content/products.ts` |
+| 10.3 | Six governance modules — 05 and 06 are separate controls | ✅ | `content/products.ts` |
+
+**10.1** Module 04 read "Data leakage prevention". Now "Data loss prevention".
+
+**10.2** The lead was "Intelligence is easy to buy. Control is not. AINerve puts one governed
+gateway between your people and every model they use." The second sentence is struck and the
+first is set as given, comma and exclamation included.
+
+**10.3** Module 05 carried both controls in one card — "Data classification and per-tool-call
+authorization" — which undercounted the modules and implied the two were a single thing. Split:
+
+| | Before | After |
+| --- | --- | --- |
+| 04 | Data leakage prevention | Data loss prevention |
+| 05 | Data classification and per-tool-call authorization | Data classification |
+| 06 | — | Per-tool-call authorization |
+
+Three places stated the old count and were corrected with it: the section heading ("Five modules"
+→ "Six modules"), the intro ("the same five controls" → "six"), and the headline stat, which read
+`5+ Governance modules` and now reads `6+`. **The stat was not in the request** — flagged here
+because a "5+" badge beside a six-item list reads as a mistake, and it is one character to put
+back. Stale comments in `AINervePage.tsx` and `ProductPage.tsx` were corrected too.
+
+**The grid is better for it.** These cards sit in `lg:grid-cols-3`, so five left an orphan cell on
+a row of its own; six fills two complete rows. Measured at 1440x900: 3 + 3, every card 148px.
+Splitting the long title also levelled the heights — card 05 used to be the tall one.
+
+Titles are stored in sentence case like their siblings; the uppercase in the design comes from
+CSS (`text-transform: uppercase`), confirmed on the rendered cards.
+
+---
+
 ## Round 9 — 19 October 2026 (the deployed site was the README)
 
 **Symptom.** "Build and Deploy" was green but the site would not load.

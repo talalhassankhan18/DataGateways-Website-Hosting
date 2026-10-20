@@ -57,7 +57,7 @@ function getAgentIcon(title: string): React.ComponentType<{ className?: string }
  * Dedicated AINerve page.
  *
  * The shared ProductPage template renders all optional sections, but AINerve has three sections
- * that benefit from their own visual treatment — the five governance modules, the fifteen agentic
+ * that benefit from their own visual treatment — the six governance modules, the fifteen agentic
  * workflows, and the gateway surface — so this page owns its layout rather than inheriting a
  * generic run. The content objects are the same ones ProductPage would use.
  */

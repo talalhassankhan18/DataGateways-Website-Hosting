@@ -68,7 +68,7 @@ export interface ProductPage {
     readonly cards: readonly IndexedCard[];
   };
 
-  /** Named capability modules, numbered. AINerve's five governance controls. */
+  /** Named capability modules, numbered. AINerve's six governance controls. */
   readonly governanceModules?: {
     readonly id: string;
     readonly eyebrow: string;
@@ -263,11 +263,14 @@ const ainerve: ProductPage = {
 
   lead: {
     id: 'lead',
-    text: 'Intelligence is easy to buy. Control is not. AINerve puts one governed gateway between your people and every model they use.',
+    /* One line, as given on 20 Oct. The sentence that followed it - "AINerve puts one governed
+       gateway between your people and every model they use." - was struck. */
+    text: 'Intelligence is easy to buy, Control is not!',
   },
 
   stats: [
-    { value: '5+', label: 'Governance modules' },
+    /* Six, not five: module 05 was two controls written as one. See governanceModules. */
+    { value: '6+', label: 'Governance modules' },
     { value: '15+', label: 'Agentic workflows' },
     /* Was "30 to 50% cost efficiency gain". Replaced 19 Oct: management asked for the
        token/usage-efficiency claim to come out and the on-premise capability to lead instead. */
@@ -276,26 +279,27 @@ const ainerve: ProductPage = {
   ],
 
   /* ---- Added 19 October 2026 from management's AINerve brief ----
-     The five governance modules and the shipped agents. Both lists are the client's own wording;
+     The six governance modules and the shipped agents. Both lists are the client's own wording;
      no capability has been described beyond the name given, because a blurb invented here would
      read as a product claim. */
 
   governanceModules: {
     id: 'governance-modules',
     eyebrow: 'AI governance',
-    heading: { roman: 'Five modules', accent: 'between people and models' },
+    heading: { roman: 'Six modules', accent: 'between people and models' },
     intro:
-      'Every prompt, response and tool call passes the same five controls, whichever model is behind the gateway.',
+      'Every prompt, response and tool call passes the same six controls, whichever model is behind the gateway.',
     cards: [
       { index: '01', title: 'Guardrails', blurb: '' },
       { index: '02', title: 'Policy management', blurb: '' },
       { index: '03', title: 'Role-based access control', blurb: '' },
-      { index: '04', title: 'Data leakage prevention', blurb: '' },
-      {
-        index: '05',
-        title: 'Data classification and per-tool-call authorization',
-        blurb: '',
-      },
+      /* "Data loss prevention" - DLP, spelled out. It read "leakage" until 20 Oct. */
+      { index: '04', title: 'Data loss prevention', blurb: '' },
+      /* 05 and 06 are two separate controls. They were carried as one card reading "Data
+         classification and per-tool-call authorization", which both undercounted the modules and
+         implied classification and authorization were a single thing. Split 20 Oct. */
+      { index: '05', title: 'Data classification', blurb: '' },
+      { index: '06', title: 'Per-tool-call authorization', blurb: '' },
     ],
   },
 

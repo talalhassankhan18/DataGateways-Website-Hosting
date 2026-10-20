@@ -138,7 +138,7 @@ export default function ProductPage() {
               className="mb-14 max-w-3xl"
             />
 
-            {/* Numbered rather than bulleted: these are five controls a prompt passes through,
+            {/* Numbered rather than bulleted: these are six controls a prompt passes through,
                 and the order is the order they run in. No blurbs — the brief gave the five
                 names and nothing else, and a sentence written here would be a product claim
                 nobody has approved. */}
